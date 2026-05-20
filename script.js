@@ -30,16 +30,17 @@ import {
 
 // 1️⃣ Cole aqui as credenciais do SEU projeto Firebase
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY_AQUI",
-  authDomain: "seu-projeto.firebaseapp.com",
-  projectId: "seu-projeto",
-  storageBucket: "seu-projeto.firebasestorage.app",
-  messagingSenderId: "SEU_SENDER_ID",
-  appId: "SEU_APP_ID"
+  apiKey: "AIzaSyA4tZjjfiOauLn2PPxYAp6ylNqB9LWJkI0",
+  authDomain: "rv-grup.firebaseapp.com",
+  projectId: "rv-grup",
+  storageBucket: "rv-grup.firebasestorage.app",
+  messagingSenderId: "1061419825993",
+  appId: "1:1061419825993:web:5cb7b020efd40b8cf13898"
+};
 };
 
 // 2️⃣ Número do WhatsApp do recrutador (com DDI 55 + DDD + número)
-const WHATSAPP_RECRUTADOR = "5594999999999";
+const WHATSAPP_RECRUTADOR = "5594981100607";
 
 // 3️⃣ Nome da empresa (aparece na mensagem do WhatsApp)
 const NOME_EMPRESA = "Vale + Grupo RV";
