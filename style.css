@@ -1,255 +1,242 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* style.css */
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
-body {
-  background: #020617;
-  color: white;
-  font-family: Arial, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 15px;
+body{
+
+  font-family:Arial,sans-serif;
+
+  background:
+  linear-gradient(
+    135deg,
+    #020617,
+    #0f172a,
+    #111827
+  );
+
+  min-height:100vh;
+
+  display:flex;
+
+  justify-content:center;
+
+  align-items:center;
+
+  overflow:hidden;
+
+  color:white;
+
 }
 
-/* SISTEMA DE TELAS */
-.tela {
-  display: none;
-  width: 100%;
-  justify-content: center;
+.overlay{
+
+  position:fixed;
+
+  inset:0;
+
+  background:
+  radial-gradient(
+    circle at top,
+    rgba(34,197,94,.15),
+    transparent 60%
+  );
+
 }
 
-.tela.ativa {
-  display: flex;
-  animation: fadeIn 0.3s;
+.container{
+
+  width:95%;
+
+  max-width:420px;
+
+  background:
+  rgba(15,23,42,.9);
+
+  border:
+  1px solid rgba(255,255,255,.08);
+
+  backdrop-filter:blur(10px);
+
+  border-radius:30px;
+
+  padding:25px;
+
+  text-align:center;
+
+  box-shadow:
+  0 0 40px rgba(0,0,0,.6);
+
+  position:relative;
+
+  z-index:2;
+
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+.logo-area h1{
+
+  color:#22c55e;
+
+  font-size:32px;
+
+  margin-bottom:8px;
+
 }
 
-/* CARD PRINCIPAL */
-.card {
-  width: 90%;
-  max-width: 400px;
-  background: #111827;
-  padding: 25px;
-  border-radius: 25px;
-  text-align: center;
-  box-shadow: 0 0 30px rgba(0, 0, 0, .5);
+.logo-area p{
+
+  color:#94a3b8;
+
+  font-size:14px;
+
+  margin-bottom:25px;
+
 }
 
-/* HEADER */
-.header {
-  margin-bottom: 20px;
+.camera-box{
+
+  position:relative;
+
+  width:100%;
+
+  height:340px;
+
+  border-radius:25px;
+
+  overflow:hidden;
+
+  background:black;
+
+  margin-bottom:20px;
+
 }
 
-h1 {
-  color: #ffc20e;
-  font-size: 26px;
-  letter-spacing: 2px;
-  margin-bottom: 5px;
+video{
+
+  width:100%;
+
+  height:100%;
+
+  object-fit:cover;
+
 }
 
-h2 {
-  color: #22c55e;
-  margin-bottom: 15px;
-  font-size: 22px;
+.scan{
+
+  position:absolute;
+
+  width:100%;
+
+  height:4px;
+
+  background:#22c55e;
+
+  top:0;
+
+  left:0;
+
+  box-shadow:
+  0 0 20px #22c55e;
+
+  animation:scan 2s linear infinite;
+
 }
 
-.subtitulo {
-  color: #94a3b8;
-  font-size: 14px;
-  letter-spacing: 1px;
-}
+@keyframes scan{
 
-/* BOTÃO OUVIR */
-.btn-ouvir {
-  background: transparent;
-  color: #ffc20e;
-  border: 2px solid #ffc20e;
-  padding: 12px;
-  border-radius: 15px;
-  width: 100%;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-bottom: 20px;
-}
-
-.btn-ouvir:active {
-  background: #ffc20e;
-  color: #020617;
-}
-
-/* AVISO LGPD */
-.aviso {
-  background: #1e293b;
-  padding: 20px;
-  border-radius: 15px;
-  margin-bottom: 25px;
-  border-left: 4px solid #22c55e;
-  text-align: left;
-}
-
-.aviso p {
-  font-size: 16px;
-  margin: 10px 0;
-}
-
-.aviso strong {
-  color: #ffc20e;
-}
-
-/* BOTÃO PRINCIPAL (VERDE GIGANTE) */
-.btn-principal {
-  width: 100%;
-  padding: 20px;
-  border: none;
-  border-radius: 15px;
-  background: #22c55e;
-  color: white;
-  font-size: 20px;
-  font-weight: 900;
-  cursor: pointer;
-  box-shadow: 0 5px 20px rgba(34, 197, 94, .4);
-  transition: all 0.2s;
-}
-
-.btn-principal:active {
-  transform: scale(0.98);
-  background: #16a34a;
-}
-
-/* CÂMERA */
-.camera {
-  overflow: hidden;
-  border-radius: 20px;
-  margin-bottom: 20px;
-  background: black;
-  height: 350px;
-  border: 3px dashed #ffc20e;
-}
-
-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scaleX(-1);
-}
-
-/* SPINNER */
-.spinner {
-  width: 70px;
-  height: 70px;
-  border: 7px solid rgba(34, 197, 94, .2);
-  border-top-color: #22c55e;
-  border-radius: 50%;
-  animation: girar 1s linear infinite;
-  margin: 20px auto;
-}
-
-@keyframes girar {
-  to { transform: rotate(360deg); }
-}
-
-/* SUCESSO */
-.check, .erro-icon {
-  font-size: 70px;
-  margin-bottom: 15px;
-  animation: pulsar 0.5s;
-}
-
-@keyframes pulsar {
-  0% { transform: scale(0); }
-  60% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
-
-.codigo-box {
-  background: #1e293b;
-  border: 3px solid #ffc20e;
-  border-radius: 20px;
-  padding: 20px;
-  margin: 20px 0;
-}
-
-.codigo-label {
-  color: #94a3b8;
-  font-size: 12px;
-  letter-spacing: 2px;
-  margin-bottom: 5px;
-}
-
-.codigo-num {
-  color: #ffc20e;
-  font-size: 42px;
-  font-weight: 900;
-  letter-spacing: 4px;
-  font-family: 'Courier New', monospace;
-}
-
-.instrucao {
-  margin: 15px 0;
-  font-size: 16px;
-}
-
-/* BOTÃO WHATSAPP */
-.btn-whatsapp {
-  display: block;
-  width: 100%;
-  padding: 20px;
-  background: #25d366;
-  color: white;
-  text-decoration: none;
-  border-radius: 15px;
-  font-size: 20px;
-  font-weight: 900;
-  box-shadow: 0 5px 20px rgba(37, 211, 102, .4);
-  margin: 15px 0;
-}
-
-.btn-whatsapp:active {
-  transform: scale(0.98);
-}
-
-.aviso-codigo {
-  background: #1e293b;
-  padding: 12px;
-  border-radius: 12px;
-  font-size: 13px;
-  color: #cbd5e1;
-  margin-top: 10px;
-}
-
-/* ERRO */
-.erro-icon {
-  color: #ef4444;
-}
-
-#tela-erro h2 {
-  color: #ef4444;
-}
-
-#erro-msg {
-  margin: 15px 0 25px;
-  color: #cbd5e1;
-}
-
-/* RESPONSIVO */
-@media (max-width: 360px) {
-  .btn-principal, .btn-whatsapp {
-    font-size: 17px;
-    padding: 17px;
+  0%{
+    top:0;
   }
-  .codigo-num {
-    font-size: 35px;
+
+  50%{
+    top:95%;
   }
-  h1 {
-    font-size: 22px;
+
+  100%{
+    top:0;
   }
+
+}
+
+button{
+
+  width:100%;
+
+  border:none;
+
+  padding:18px;
+
+  border-radius:20px;
+
+  background:
+  linear-gradient(
+    90deg,
+    #22c55e,
+    #16a34a
+  );
+
+  color:white;
+
+  font-size:18px;
+
+  font-weight:bold;
+
+  cursor:pointer;
+
+  transition:.3s;
+
+  margin-bottom:20px;
+
+}
+
+button:hover{
+
+  transform:scale(1.02);
+
+}
+
+#status{
+
+  font-size:15px;
+
+  color:#cbd5e1;
+
+  margin-bottom:20px;
+
+}
+
+.infos{
+
+  display:grid;
+
+  grid-template-columns:
+  repeat(2,1fr);
+
+  gap:10px;
+
+}
+
+.info-card{
+
+  background:
+  rgba(255,255,255,.05);
+
+  border:
+  1px solid rgba(255,255,255,.05);
+
+  border-radius:15px;
+
+  padding:12px;
+
+  font-size:13px;
+
+  color:#cbd5e1;
+
+}
+
+canvas{
+  display:none;
 }
