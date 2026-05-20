@@ -1,6 +1,5 @@
-<!-- index.html -->
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 
 <head>
 
@@ -22,23 +21,27 @@ href="style.css">
 
 <body>
 
-<div class="overlay"></div>
+<div class="bg"></div>
 
-<div class="container">
+<div class="app">
 
-<div class="logo-area">
+<div class="top">
+
+<div class="badge">
+CHECK-IN DIGITAL
+</div>
 
 <h1>
 GRUPO RV + VALE
 </h1>
 
 <p>
-CHECK-IN INTELIGENTE
+Sistema Inteligente
 </p>
 
 </div>
 
-<div class="camera-box">
+<div class="camera-area">
 
 <video
 id="video"
@@ -47,11 +50,11 @@ playsinline
 muted>
 </video>
 
-<div class="scan"></div>
+<div class="camera-overlay"></div>
 
 </div>
 
-<button id="checkinBtn">
+<button id="btn">
 
 REALIZAR CHECK-IN
 
@@ -59,27 +62,13 @@ REALIZAR CHECK-IN
 
 <div id="status">
 
-Aguardando...
+Inicializando câmera...
 
 </div>
 
-<div class="infos">
+<div class="loading">
 
-<div class="info-card">
-📸 Selfie automática
-</div>
-
-<div class="info-card">
-📍 Localização GPS
-</div>
-
-<div class="info-card">
-🌐 IP do dispositivo
-</div>
-
-<div class="info-card">
-📱 Identificação do aparelho
-</div>
+<div class="bar"></div>
 
 </div>
 
