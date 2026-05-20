@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" content="#008f6b">
+  <title>VAGAS — VALE + GRUPO RV</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- TELA 1: INÍCIO -->
+  <div id="tela-inicio" class="tela ativa">
+    <div class="card">
+      <div class="header">
+        <h1>VAGAS ABERTAS</h1>
+        <p class="subtitulo">VALE + GRUPO RV</p>
+      </div>
+
+      <button id="btn-ouvir" class="btn-ouvir">
+        🔊 OUVIR INSTRUÇÕES
+      </button>
+
+      <div class="aviso">
+        <p>📸 Vamos tirar sua <strong>FOTO</strong></p>
+        <p>📍 Vamos ver sua <strong>LOCALIZAÇÃO</strong></p>
+        <p>📱 Depois você fala no <strong>WHATSAPP</strong></p>
+      </div>
+
+      <button id="btn-iniciar" class="btn-principal">
+        📸 ME CADASTRAR
+      </button>
+    </div>
+  </div>
+
+  <!-- TELA 2: CÂMERA -->
+  <div id="tela-camera" class="tela">
+    <div class="card">
+      <h2>POSICIONE SEU ROSTO</h2>
+      <div class="camera">
+        <video id="video" autoplay playsinline muted></video>
+      </div>
+      <button id="btn-capturar" class="btn-principal">
+        📸 TIRAR FOTO
+      </button>
+      <canvas id="canvas" style="display:none;"></canvas>
+    </div>
+  </div>
+
+  <!-- TELA 3: PROCESSANDO -->
+  <div id="tela-processando" class="tela">
+    <div class="card">
+      <div class="spinner"></div>
+      <h2 id="processando-titulo">SALVANDO...</h2>
+      <p id="processando-detalhe">Aguarde alguns segundos</p>
+    </div>
+  </div>
+
+  <!-- TELA 4: SUCESSO -->
+  <div id="tela-sucesso" class="tela">
+    <div class="card">
+      <div class="check">✅</div>
+      <h2>CADASTRO REALIZADO!</h2>
+      <div class="codigo-box">
+        <p class="codigo-label">SEU CÓDIGO:</p>
+        <p id="codigo" class="codigo-num">RV-0000</p>
+      </div>
+      <p class="instrucao">Toque no botão verde para falar no WhatsApp:</p>
+      <a id="btn-whatsapp" href="#" class="btn-whatsapp">
+        💬 FALAR NO WHATSAPP
+      </a>
+      <p class="aviso-codigo">⚠️ Guarde seu código!</p>
+    </div>
+  </div>
+
+  <!-- TELA 5: ERRO -->
+  <div id="tela-erro" class="tela">
+    <div class="card">
+      <div class="erro-icon">❌</div>
+      <h2>OPS! ALGO DEU ERRADO</h2>
+      <p id="erro-msg">Tente novamente.</p>
+      <button onclick="location.reload()" class="btn-principal">
+        🔄 TENTAR DE NOVO
+      </button>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
