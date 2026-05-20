@@ -1,3 +1,5 @@
+// script.js
+
 import { initializeApp }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
@@ -43,6 +45,12 @@ document.getElementById("video");
 const statusText =
 document.getElementById("status");
 
+const button =
+document.getElementById("checkinBtn");
+
+const canvas =
+document.getElementById("canvas");
+
 let cameraPronta = false;
 
 async function iniciarCamera(){
@@ -63,16 +71,12 @@ async function iniciarCamera(){
 
     video.srcObject = stream;
 
-    video.onloadedmetadata = async()=>{
+    await video.play();
 
-      await video.play();
+    cameraPronta = true;
 
-      cameraPronta = true;
-
-      statusText.innerHTML =
-      "✅ Câmera frontal ativa";
-
-    };
+    statusText.innerHTML =
+    "✅ Câmera pronta";
 
   }
 
@@ -82,10 +86,6 @@ async function iniciarCamera(){
 
     statusText.innerHTML =
     "❌ Permita câmera";
-
-    alert(
-      "Permita acesso à câmera"
-    );
 
   }
 
@@ -97,84 +97,150 @@ window.onload = ()=>{
 
 };
 
-window.capturar =
-async function(){
+button.addEventListener(
+  "click",
+  async()=>{
 
-  if(!cameraPronta){
+    if(!cameraPronta){
 
-    alert(
-      "A câmera ainda não iniciou"
-    );
+      alert(
+        "Câmera não iniciada"
+      );
 
-    return;
+      return;
+    }
+
+    try{
+
+      button.disabled = true;
+
+      button.innerHTML =
+      "PROCESSANDO...";
+
+      statusText.innerHTML =
+      "📸 Capturando selfie...";
+
+      canvas.width =
+      video.videoWidth;
+
+      canvas.height =
+      video.videoHeight;
+
+      const ctx =
+      canvas.getContext("2d");
+
+      ctx.drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      const selfie =
+      canvas.toDataURL(
+        "image/jpeg",
+        0.7
+      );
+
+      statusText.innerHTML =
+      "📍 Obtendo localização...";
+
+      const posicao =
+      await new Promise(
+        (resolve,reject)=>{
+
+          navigator.geolocation
+          .getCurrentPosition(
+            resolve,
+            reject
+          );
+
+        }
+      );
+
+      const latitude =
+      posicao.coords.latitude;
+
+      const longitude =
+      posicao.coords.longitude;
+
+      statusText.innerHTML =
+      "🌐 Obtendo IP...";
+
+      const ipReq =
+      await fetch(
+        "https://api.ipify.org?format=json"
+      );
+
+      const ipData =
+      await ipReq.json();
+
+      const ip =
+      ipData.ip;
+
+      statusText.innerHTML =
+      "💾 Salvando check-in...";
+
+      const dados = {
+
+        selfie:selfie,
+
+        latitude:latitude,
+
+        longitude:longitude,
+
+        ip:ip,
+
+        userAgent:
+        navigator.userAgent,
+
+        plataforma:
+        navigator.platform,
+
+        idioma:
+        navigator.language,
+
+        larguraTela:
+        window.innerWidth,
+
+        alturaTela:
+        window.innerHeight,
+
+        data:
+        serverTimestamp()
+
+      };
+
+      await addDoc(
+        collection(
+          db,
+          "checkins"
+        ),
+        dados
+      );
+
+      statusText.innerHTML =
+      "✅ CHECK-IN REALIZADO";
+
+      button.innerHTML =
+      "CHECK-IN CONCLUÍDO";
+
+    }
+
+    catch(err){
+
+      console.log(err);
+
+      statusText.innerHTML =
+      "❌ Erro no check-in";
+
+      button.disabled = false;
+
+      button.innerHTML =
+      "REALIZAR CHECK-IN";
+
+    }
+
   }
-
-  const nome =
-  document.getElementById("nome")
-  .value;
-
-  if(!nome){
-
-    alert(
-      "Digite seu nome"
-    );
-
-    return;
-  }
-
-  const canvas =
-  document.getElementById("canvas");
-
-  canvas.width =
-  video.videoWidth;
-
-  canvas.height =
-  video.videoHeight;
-
-  const ctx =
-  canvas.getContext("2d");
-
-  ctx.drawImage(
-    video,
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
-
-  const imagem =
-  canvas.toDataURL(
-    "image/jpeg",
-    0.7
-  );
-
-  try{
-
-    await addDoc(
-      collection(db,"checkins"),
-      {
-
-        nome:nome,
-
-        foto:imagem,
-
-        data:serverTimestamp()
-
-      }
-    );
-
-    statusText.innerHTML =
-    "✅ Check-in realizado";
-
-  }
-
-  catch(err){
-
-    console.log(err);
-
-    statusText.innerHTML =
-    "❌ Erro ao salvar";
-
-  }
-
-}
+);
