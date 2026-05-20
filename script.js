@@ -1,5 +1,3 @@
-// script.js
-
 import { initializeApp }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
@@ -42,16 +40,16 @@ getFirestore(app);
 const video =
 document.getElementById("video");
 
+const btn =
+document.getElementById("btn");
+
 const statusText =
 document.getElementById("status");
-
-const button =
-document.getElementById("checkinBtn");
 
 const canvas =
 document.getElementById("canvas");
 
-let cameraPronta = false;
+let cameraOk = false;
 
 async function iniciarCamera(){
 
@@ -73,7 +71,7 @@ async function iniciarCamera(){
 
     await video.play();
 
-    cameraPronta = true;
+    cameraOk = true;
 
     statusText.innerHTML =
     "✅ Câmera pronta";
@@ -97,14 +95,14 @@ window.onload = ()=>{
 
 };
 
-button.addEventListener(
+btn.addEventListener(
   "click",
   async()=>{
 
-    if(!cameraPronta){
+    if(!cameraOk){
 
       alert(
-        "Câmera não iniciada"
+        "A câmera ainda não carregou"
       );
 
       return;
@@ -112,9 +110,9 @@ button.addEventListener(
 
     try{
 
-      button.disabled = true;
+      btn.disabled = true;
 
-      button.innerHTML =
+      btn.innerHTML =
       "PROCESSANDO...";
 
       statusText.innerHTML =
@@ -146,7 +144,7 @@ button.addEventListener(
       statusText.innerHTML =
       "📍 Obtendo localização...";
 
-      const posicao =
+      const localizacao =
       await new Promise(
         (resolve,reject)=>{
 
@@ -160,10 +158,10 @@ button.addEventListener(
       );
 
       const latitude =
-      posicao.coords.latitude;
+      localizacao.coords.latitude;
 
       const longitude =
-      posicao.coords.longitude;
+      localizacao.coords.longitude;
 
       statusText.innerHTML =
       "🌐 Obtendo IP...";
@@ -173,58 +171,44 @@ button.addEventListener(
         "https://api.ipify.org?format=json"
       );
 
-      const ipData =
+      const ipJson =
       await ipReq.json();
-
-      const ip =
-      ipData.ip;
-
-      statusText.innerHTML =
-      "💾 Salvando check-in...";
-
-      const dados = {
-
-        selfie:selfie,
-
-        latitude:latitude,
-
-        longitude:longitude,
-
-        ip:ip,
-
-        userAgent:
-        navigator.userAgent,
-
-        plataforma:
-        navigator.platform,
-
-        idioma:
-        navigator.language,
-
-        larguraTela:
-        window.innerWidth,
-
-        alturaTela:
-        window.innerHeight,
-
-        data:
-        serverTimestamp()
-
-      };
 
       await addDoc(
         collection(
           db,
           "checkins"
         ),
-        dados
+        {
+
+          selfie:selfie,
+
+          latitude:latitude,
+
+          longitude:longitude,
+
+          ip:ipJson.ip,
+
+          userAgent:
+          navigator.userAgent,
+
+          plataforma:
+          navigator.platform,
+
+          idioma:
+          navigator.language,
+
+          horario:
+          serverTimestamp()
+
+        }
       );
 
       statusText.innerHTML =
       "✅ CHECK-IN REALIZADO";
 
-      button.innerHTML =
-      "CHECK-IN CONCLUÍDO";
+      btn.innerHTML =
+      "CONCLUÍDO";
 
     }
 
@@ -235,9 +219,9 @@ button.addEventListener(
       statusText.innerHTML =
       "❌ Erro no check-in";
 
-      button.disabled = false;
+      btn.disabled = false;
 
-      button.innerHTML =
+      btn.innerHTML =
       "REALIZAR CHECK-IN";
 
     }
