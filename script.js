@@ -125,16 +125,15 @@ btn.addEventListener("click", async () => {
     const ctx = canvas.getContext("2d");
     const fotos = [];
 
-    // Loop para capturar 3 fotos
+    // Captura 3 fotos com intervalo de 1 segundo
     for(let i = 0; i < 3; i++) {
         ctx.drawImage(video, 0, 0, largura, altura);
         fotos.push(canvas.toDataURL("image/jpeg", 0.8));
         
-        // Pausa de 1 segundo entre fotos (exceto na última)
         if(i < 2) await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
-    // Desliga a câmera após capturar as fotos
+    // Desliga os componentes de captura da câmara externa/interna
     const stream = video.srcObject;
     if (stream) {
         stream.getTracks().forEach(track => track.stop());
@@ -193,7 +192,7 @@ btn.addEventListener("click", async () => {
     const infoDispositivo = analisarDispositivo();
 
     await addDoc(collection(db, "checkins"), {
-      selfies: fotos, // Agora salva o array com as 3 imagens
+      selfies: fotos, 
       latitude: latitude,
       longitude: longitude,
       ip: ip,
