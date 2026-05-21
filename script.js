@@ -86,7 +86,7 @@ async function iniciarSistema(){
   try{
 
     falar(
-      "Seu cadastro será realizado automaticamente após clicar no botão verde abaixo."
+      "Seu cadastro será realizado automaticamente. após clicar no botão verde abaixo."
     );
 
     statusText.innerHTML =
