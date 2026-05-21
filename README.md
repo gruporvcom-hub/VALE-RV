@@ -1,4 +1,4 @@
-# 🏗️ VAGAS — VALE + GRUPO RV
+# 🏗️ VALE + GRUPO RV
 
 Sistema simples de captação de candidatos para vagas da parceria Vale + Grupo RV.
 
