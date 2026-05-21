@@ -3,7 +3,7 @@
 ## 📁 Arquivos
 
 - `index.html` — Estrutura da página
-- `style.css` — Estilo (dark mode com identidade Vale)
+- `style.css` — Estilo (dark mode com identidade )
 - `script.js` — Lógica completa (Firebase + câmera + GPS)
 
 ## 🔧 Tecnologias
