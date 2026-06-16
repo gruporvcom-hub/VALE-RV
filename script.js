@@ -223,7 +223,8 @@ btn.addEventListener("click", async () => {
 
   } catch(err) {
     console.log(err);
-    statusText.innerHTML = "❌ Erro no cadastro";
+    // Exibe o erro real direto na tela para sabermos o que aconteceu
+    statusText.innerHTML = "❌ Erro: " + (err.message || JSON.stringify(err)); 
     btn.disabled = false;
     btn.innerHTML = "QUERO PARTICIPAR";
   }
