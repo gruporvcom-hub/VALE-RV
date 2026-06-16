@@ -3,7 +3,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 // 2. SUBSTITUA O BLOCO 'const firebaseConfig' POR ESTE:
 // Nota: Pegue a URL do seu projeto em Settings -> API -> Project URL no painel do Supabase
-const SUPABASE_URL = "https://SEU_PROJETO_ID.supabase.co"; 
+const SUPABASE_URL = "https://gskcadoofoqwhqshcxcs.supabase.co"; 
 const SUPABASE_KEY = "sb_publishable_xup-F-C4wv_epMIAbohpjQ_aXnLZOL3"; // Sua chave pública enviada
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
