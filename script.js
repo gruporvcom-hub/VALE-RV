@@ -2,9 +2,9 @@
 // CONFIGURAÇÃO DE CONEXÃO (Usando o Supabase Global do HTML)
 // =================================================================
 const SUPABASE_URL = "https://gskcadoofoqwhqshcxcs.supabase.co"; 
+// USE APENAS A PUBLISHABLE KEY ABAIXO:
 const SUPABASE_KEY = "sb_publishable_xup-F-C4wv_epMIAbohpjQ_aXnLZOL3"; 
 
-// Inicialização sem o 'import' que quebrava no celular
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Elementos da Página
