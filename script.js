@@ -209,3 +209,28 @@ btn.addEventListener("click", async () => {
           versao_android: infoDispositivo.androidVersion,
           navegador: infoDispositivo.browser,
           plataforma: navigator.platform,
+          idioma: navigator.language,
+          largura_tela: window.innerWidth,
+          altura_tela: window.innerHeight
+        }
+      ]);
+
+    if (error) throw error;
+
+    // ======================
+    // SUCESSO FINAL
+    // ======================
+    statusText.innerHTML = "✅ Cadastro concluído";
+    falar("Cadastro concluído com sucesso.");
+
+    setTimeout(() => {
+      window.location.href = "https://wa.me/5594981100607?text=Eu%20concordo%20e%20quero%20participar%20das%20vagas%20do%20Grupo%20RV%20%2B%20Vale.";
+    }, 2000);
+
+  } catch(err) {
+    console.log(err);
+    statusText.innerHTML = "❌ Erro: " + (err.message || JSON.stringify(err));
+    btn.disabled = false;
+    btn.innerHTML = "QUERO PARTICIPAR";
+  }
+});
