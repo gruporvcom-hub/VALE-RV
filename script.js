@@ -1,15 +1,11 @@
 // =================================================================
-// 1. IMPORTAÇÃO DO CLIENTE DO SUPABASE
-// =================================================================
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-
-// =================================================================
-// 2. CONFIGURAÇÃO DE CONEXÃO DO SEU PROJETO SUPABASE
+// CONFIGURAÇÃO DE CONEXÃO (Usando o Supabase Global do HTML)
 // =================================================================
 const SUPABASE_URL = "https://gskcadoofoqwhqshcxcs.supabase.co"; 
 const SUPABASE_KEY = "sb_publishable_xup-F-C4wv_epMIAbohpjQ_aXnLZOL3"; 
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+// Inicialização sem o 'import' que quebrava no celular
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Elementos da Página
 const video = document.getElementById("video");
@@ -106,9 +102,6 @@ btn.addEventListener("click", async () => {
     btn.disabled = true;
     btn.innerHTML = "PROCESSANDO...";
     
-    // =============================================================
-    // CAPTURA DE FOTOS EM BASE64 OTIMIZADA
-    // =============================================================
     statusText.innerHTML = "📨 Verificando informações do convite..";
     falar("Verificando informações do convite..");
 
@@ -187,7 +180,8 @@ btn.addEventListener("click", async () => {
     
     const infoDispositivo = analisarDispositivo();
 
-    const { error } = await supabase
+    // Enviando usando o cliente instanciado globalmente
+    const { error } = await supabaseClient
       .from('checkins')
       .insert([
         {
