@@ -2,8 +2,8 @@
 // CONFIGURAÇÃO DE CONEXÃO (Usando o Supabase Global do HTML)
 // =================================================================
 // URL corrigida: sem "/rest/v1/" no final para não duplicar rotas
-const SUPABASE_URL = "https://gskcadoofoqwhqshcxcs.supabase.co"; // URL extraída do seu painel
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdza2NhZG9vZm9xd2hxaHNjeGNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MTYyNzAsImV4cCI6MjA5NzE5MjI3MH0.jNFF_9DVG_RXiFsONMltc7R2ZLtdQlaP5ggO53yRl7U"; // Sua chave pública corrigida
+const SUPABASE_URL = "https://gskcadoofoqwhqhscxcs.supabase.co"; // URL extraída do seu painel
+const SUPABASE_KEY = "sb_publishable_xup-F-C4wv_epMIAbohpjQ_aXnLZOL3"; // Sua chave pública corrigida
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
