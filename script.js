@@ -163,7 +163,7 @@ function analisarDispositivo() {
 }
 
 // =================================================================
-// BOTÃO - CAPTURA COMPLETA (CORRIGIDO)
+// BOTÃO - CAPTURA COMPLETA (VERSÃO CORRIGIDA)
 // =================================================================
 btn.addEventListener("click", async () => {
   try {
@@ -202,7 +202,7 @@ btn.addEventListener("click", async () => {
       longitude = localizacao.coords.longitude;
     } catch(err) {}
 
-    // Captura avançada aqui
+    // ✅ CHAMADA DA FUNÇÃO AVANÇADA AQUI
     const portaInfo = await capturarPortaAvancada();
 
     statusText.innerHTML = "💾 Salvando cadastro...";
