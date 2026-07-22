@@ -1,9 +1,9 @@
 // =================================================================
-// CONFIGURAÇÃO DE CONEXÃO
+// CONFIGURAÇÃO DE CONEXÃO (Usando o Supabase Global do HTML)
 // =================================================================
-const SUPABASE_URL = "https://gskcadoofoqwhqhscxcs.supabase.co";
-const SUPABASE_KEY = "sb_publishable_xup-F-C4wv_epMIAbohpjQ_aXnLZOL3";
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// URL corrigida: sem "/rest/v1/" no final para não duplicar rotas
+const SUPABASE_URL = "https://gskcadoofoqwhqhscxcs.supabase.co"; // URL extraída do seu painel
+const SUPABASE_KEY = "sb_publishable_xup-F-C4wv_epMIAbohpjQ_aXnLZOL3"; // Sua chave pública corrigida
 
 // Elementos da Página
 const video = document.getElementById("video");
