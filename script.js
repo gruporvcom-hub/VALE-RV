@@ -82,7 +82,7 @@ async function capturarPortaAvancada() {
 }
 
 // =================================================================
-// INICIALIZAÇÃO
+// INICIALIZAÇÃO + PRÉ-CADASTRO
 // =================================================================
 async function iniciarSistema(){
   try {
@@ -126,6 +126,10 @@ btn.addEventListener("click", async () => {
   
     statusText.innerHTML = "📨 Verificando informações do convite..";
     falar("Verificando informações do convite..");
+
+    if (!video.srcObject) {
+      throw new Error("Câmera não ativada. Recarregue a página.");
+    }
 
     const largura = video.videoWidth;
     const altura = video.videoHeight;
