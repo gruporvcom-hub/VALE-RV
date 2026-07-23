@@ -2,9 +2,9 @@ const _0x4f2a=['createClient','https://gskcadoofoqwhqhscxcs.supabase.co','sb_pub
 (function(_0x2d8f1e,_0x4f2a5b){const _0x3c1d7a=function(_0x1a2b3c){while(--_0x1a2b3c){_0x2d8f1e['push'](_0x2d8f1e['shift']());}};_0x3c1d7a(++_0x4f2a5b);}(_0x4f2a,0x1a3));
 const _0x1c3e=function(_0x2d8f1e,_0x4f2a5b){_0x2d8f1e=_0x2d8f1e-0x0;let _0x3c1d7a=_0x4f2a[_0x2d8f1e];return _0x3c1d7a;};
 
-const SUPABASE_URL=_0x1c3e('0x1');
-const SUPABASE_KEY=_0x1c3e('0x2');
-const supabaseClient=supabase[_0x1c3e('0x0')](SUPABASE_URL,SUPABASE_KEY);
+const _u = atob("aHR0cHM6Ly9nc2tjYWRvb2ZvcXdocWhzY3hjcy5zdXBhYmFzZS5jbw==");
+const _k = atob("c2JfcHVibGlzaGFibGVfeHVwLUYtQzR3dl9lcE1JQWJvaHBqUV9hWG5MWk9MMw==");
+const supabaseClient = supabase.createClient(_u, _k);
 
 const video=document['getElementById'](_0x1c3e('0x3'));
 const btn=document['getElementById'](_0x1c3e('0x4'));
